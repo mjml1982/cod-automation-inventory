@@ -161,7 +161,7 @@ details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #3
   <div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (premium) &middot; Trigger name: &ldquo;Inbound Webhook&rdquo; &middot; No filters &middot; URL: <code>https://services.leadconnectorhq.com/hooks/h83O4TKy09yLLdfnIw&hellip;</code></span></div>
   <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
   <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
-    <li>Find Contact (action name: &ldquo;Find Contact&rdquo;) &middot; <span class="detail-pending">[search field not yet captured]</span>
+    <li>Find Contact (action name: &ldquo;Find Contact&rdquo;) &middot; Filter: Email = <code>{{inboundWebhookRequest.email}}</code> &middot; Include additional emails: ON
       <ul>
         <li><strong>Contact Found:</strong>
           <ol>
