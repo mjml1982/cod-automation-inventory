@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Cold Email Nurture - COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+
+details.wf-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+details.wf-card summary { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; font-size: .85rem; }
+details.wf-card summary::-webkit-details-marker { display: none; }
+details.wf-card summary:hover { background: #1c2128; }
+details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #30363d; }
+.wf-header-row { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; padding: 6px 14px; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: #8b949e; font-weight: 600; margin-bottom: 4px; }
+.wf-num { color: #6e7681; font-size: .8rem; }
+.wf-name { font-weight: 600; color: #e6edf3; }
+.wf-folder, .wf-subfolder { color: #8b949e; font-size: .82rem; }
+.wf-url { font-size: .78rem; }
+.wf-url a { color: #58a6ff; }
+.detail-dot { color: #3fb950; font-size: .6rem; vertical-align: middle; }
+.wf-detail { padding: 14px 18px; }
+.detail-pending { color: #6e7681; font-size: .83rem; font-style: italic; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: .85rem; }
+.detail-label { min-width: 110px; color: #8b949e; font-weight: 600; font-size: .78rem; text-transform: uppercase; padding-top: 2px; }
+.detail-val { color: #cdd9e5; flex: 1; }
+.email-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.email-meta { font-size: .75rem; color: #8b949e; margin-bottom: 4px; }
+.email-subject { font-weight: 600; color: #f0f6fc; margin-bottom: 8px; }
+.email-body { white-space: pre-wrap; font-size: .82rem; color: #cdd9e5; font-family: Arial, sans-serif; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.email-link { font-size: .78rem; color: #8b949e; margin-top: 6px; }
+.wf-screenshot { max-width: 100%; border-radius: 4px; border: 1px solid #30363d; margin-top: 6px; }
+</style></head><body><div class="container">
+<header><h1>COD Automation Inventory</h1><p>Prepared for Rehan &amp; Kas &mdash; 2026-06-05</p></header>
+<nav><a href="index.html">&larr; Back to Index</a></nav>
+<div class="section-header"><h2>Cold Email Nurture</h2></div>
+<p style="color:#8b949e;font-size:.88rem;margin-bottom:16px">Nurture and booking automations for cold email leads, new lead pipelines, and call booking sequences.</p>
+<div class="summary-bar"><strong>3</strong> total &nbsp;&middot;&nbsp; <strong style="color:#3fb950">3</strong> live &nbsp;&middot;&nbsp; <strong style="color:#d29922">0</strong> draft/inactive &nbsp;&middot;&nbsp; <strong style="color:#58a6ff">2</strong> details captured</div>
+<div class="wf-header-row"><span class="wf-num">#</span><span class="wf-name">Workflow Name</span><span class="wf-folder">Folder</span><span class="wf-subfolder">Subfolder</span><span>Status</span><span>GHL URL</span></div><details class="wf-card"><summary><span class="wf-num">1</span><span class="wf-name">Cold Email - Call Booked</span><span class="wf-folder">Cold Email - Call Booked</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/048396e8-df27-41ae-8c22-9eb340c991f0" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">2</span><span class="wf-name">New Lead (GHL -&gt; Sendgrid) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/2475cc99-8beb-4200-973e-129fb7ac87f7" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Contact Created (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">10 days after any new contact is created, POSTs the contact's email, firstname, lastname, and phone to a Zapier webhook, which syncs the contact into Sendgrid for email marketing.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">⚠ Broad trigger — fires for ALL new contacts regardless of source. 460 contacts currently waiting at the 10-day step. Zapier webhook: https://hooks.zapier.com/hooks/catch/197847/2qbdfg5/ — Zapier zap ID 197847. Payload fields: email, firstname, lastname, phone.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/new-lead-ghl-sendgrid-overview.png" alt="New Lead (GHL -&gt; Sendgrid) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">3</span><span class="wf-name">2.2 - Book A Call (universal) KAMG <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Book a Call Sequence - Universal</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/751af704-9073-4d4e-a6da-bda61ffb65e1" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — no direct trigger. Added to this workflow by other workflows via Add to Workflow step.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">16-email nurture sequence to get leads to book a strategy call. Emails 1-4 send 1 day apart, Emails 5-16 send every 2 days. Covers Russ's story, the expert income ceiling problem, objection handling, client stories, and CTAs to book a call or buy the $27 workshop.</span></div><div class="detail-row"><span class="detail-label">Called by</span><span class="detail-val">1.1 - Registrations Emails (JIT), 1.1 - Registrations Emails</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">KAMG variant. No direct trigger — added by other workflows. Note: Emails 14 and 15 share the same subject line 'The part of this you can't lose' — this appears intentional in the source.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/book-a-call-universal-kamg-overview.png" alt="2.2 - Book A Call (universal) KAMG canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Immediately &middot; From: Russ</div><div class="email-subject">Subject: For experts who are tired of trading time</div><pre class="email-body">Hi {{contact.first_name}},
+
+The short version of what we do and who I am: I'm Russ Ruffino. I run a company called Clients on Demand. For the last 13 years we've worked with coaches, therapists, attorneys, accountants, doctors, consultants and other credentialed experts to turn their expertise into $5k to $15k online programs they can deliver from anywhere in the world. 
+
+We've done it with over 6,000 people, and the model has held up through three recessions, a pandemic and four different presidencies.
+
+If you're an expert who's been trading time for money for a long time and deep down you know there's a different way to package what you do, the masterclass link we sent you above is the right place to start.
+
+But if you've already watched the class and haven't booked a call to see if we're the right fit to help you build your very own clients on demand system, than I encourage you to jump on a call with our team. 
+
+Here's the link: BOOKING LINK
+Russ
+
+P.S. Tomorrow I'm going to walk you through the math that quietly traps almost every expert I've ever met. It's not about price. It's about the equation underneath the price. Open it.</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 day &middot; From: Russ</div><div class="email-subject">Subject: The math nobody told you about</div><pre class="email-body">Hi {{contact.first_name}},
+
+If you're still charging by the hour than your income is still tied to two things:
+
+How many hours you can sell.
+
+And how much people are willing to pay for those hours.
+
+That's true whether you're charging $250 a session, billing $400 an hour, selling $5k retainers, or working with a full roster of one-on-one clients.
+
+At some point, the same ceiling shows up.
+
+You can take on more clients, but then your calendar fills up.
+
+You can raise your prices, but if the offer still feels like access to your time, the market eventually pushes back.
+
+That's where a lot of experts get stuck.
+
+They don't need more random inquiries.
+
+They need a better way to turn what they already know into something people will actually pay premium money for.
+
+One person on a sales call said it like this:
+
+"I'm not looking for more random leads who can't afford to work with me. I need a better way to turn what I already know into something people will actually pay premium money for."
+
+If that sounds familiar, this is exactly what we look at on the strategy call.
+
+We'll help you see where your current model is capped, what your expertise could become as a $5k to $15k online program, and whether Clients on Demand is the right fit to help you build it.
+
+Click here to book a call with my team.
+Russ
+
+P.S. The second most common line I hear on those calls: "I'm great at what I do. I just hate what I have to do to get clients." If that one hit you too, you've already done the math without realizing it.</pre></div><div class="email-block"><div class="email-meta">Email 3 &middot; Wait 1 day &middot; From: Russ</div><div class="email-subject">Subject: I didn't want to be a 40-year-old bartender</div><pre class="email-body">Hi {{contact.first_name}},
+
+spent 10 years bartending.
+
+And after a while, I started to see the future a little too clearly.
+
+Same bar.
+Same hours.
+Same conversations.
+Same ceiling.
+
+I was good at it. That was part of the problem. But being good at something doesn't mean it's the life you're supposed to keep repeating.
+
+At some point, I realized I didn't want the next 10 years to look exactly like the last 10.
+
+I didn't want to wake up at 40 and still be standing behind a bar, making drinks for people who seemed to have more freedom than I did.
+
+Around that same time, I was playing in an '80s cover band.
+
+One day, the younger brother of our guitarist came in and started bragging about how he was making money online with affiliate marketing.
+
+didn't know much about it. But I knew enough to pay attention.
+
+Then, not long after that, I was walking through Barnes &amp; Noble and saw The 4-Hour Workweek.
+
+I picked it up.
+
+And for the first time, I saw a different kind of future.
+Not because I wanted to do less work.
+
+Because I wanted the work to finally build something I could be proud of, that also gave me my time back.
+
+Something that didn't require me to be in one physical place to get paid.
+
+That was the beginning.
+It wasn't clean.
+It wasn't fast.
+I had years of false starts, bad ideas, wrong offers, and things that looked good on paper but didn't sell.
+
+But eventually, I figured out the model that became Clients on Demand.
+
+For the last 13 years, we've helped over 6,000 coaches, therapists, attorneys, accountants, doctors, and other credentialed experts turn what they know into $5K to $15K online programs they can run from anywhere.
+
+And I'm telling you this because most experts eventually hit their own version of that moment.
+The moment you realize the work is good…But the model is too small.
+
+The clients are still showing up.
+The money may be fine.
+You may even be respected for what you do.
+
+But underneath all of it, there's a quiet question you can't shake:
+"Do I really want the next 10 years to look like the last 10?"
+
+If the answer is no, that's not a problem.
+It's a signal.
+
+The 45-minute call my team runs is for figuring out what's underneath that signal and whether we can help you build the next version of your work. Book your complimentary call here.
+
+Russ
+
+P.S. You do not need to throw away everything you've built. Most of the time, the expertise is already there. The real issue is the business model around it.</pre></div><div class="email-block"><div class="email-meta">Email 4 &middot; Wait 1 day &middot; From: Russ</div><div class="email-subject">Subject: Why we don't make experts become influencers</div><pre class="email-body">Hi {{contact.first_name}},
+
+You've probably seen at least one expert in your field trying to turn themselves into a full-time content creator.
+Daily reels.
+Hot takes.
+Podcast clips.
+And if you're an expert — a therapist, attorney, accountant, doctor, consultant, or coach with real training and a real practice — you've probably wondered some version of:
+"Is this really what I have to do to get more clients?"
+No.
+That's not the model.
+For 13 years, we've helped over 6,000 experts build $5K to $15K+ online programs they can run from anywhere in the world without turning themselves into influencers or spending their life feeding the content machine.
+Because the problem usually isn't your expertise.
+It's the business model around it.
+You don't need to become louder.
+You don't need to become trendier.
+You need a clean path that turns the expertise you already have into premium clients.
+That's what Clients on Demand is built to help you do.
+
+The 45-minute call with my team is for figuring out whether your expertise can become a $5K to $15K online program and what that would actually look like. Book a complimentary call here.
+
+Russ
+
+P.S. If you've been avoiding this because you don't want to become a content creator, good. You shouldn't have to. The goal is not to become famous. The goal is to become paid for the value you already know how to create.</pre></div><div class="email-block"><div class="email-meta">Email 5 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: The thing you can't fake</div><pre class="email-body">Hi {{contact.first_name}},
+
+I've worked with over six thousand clients across the last 13 years.
+
+Here's one of them in his own words:
+
+What I want you to notice about Guy's story isn't just the income growth.
+
+It's how simple the path became once the right pieces were in place.
+
+An ad that gets the right person's attention.
+
+A webinar that explains the offer clearly.
+
+A phone call with someone who already understands the problem you solve.
+
+A new client.
+
+That's the part most experts overcomplicate.
+
+They think they need a bigger audience, a more impressive website, a complicated funnel, or some totally new business idea.
+
+Most of the time, they don't.
+
+They need a clear premium offer, a way to explain why it matters, and a reliable path for the right people to find them.
+
+That's what Clients on Demand is built to help you create.
+
+Most people who come to us are skeptical at first. They've seen enough internet promises to know better.
+
+But the reason this works is not magic.
+
+It's a simple model applied to the right expertise.
+
+Ad.
+Webinar.
+Phone call.
+New client.
+
+If you want my team to look at your expertise and map out what this could look like in your business, click the link here to book a call with us.
+
+Russ
+
+P.S. Guy said it best: "Don't overthink it, just DO IT!" Sometimes the simplest model is the one experts avoid because they're used to making everything more complicated than it needs to be.</pre></div><div class="email-block"><div class="email-meta">Email 6 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: Two doors, you pick</div><pre class="email-body">Hi {{contact.first_name}},
+
+There are two doors into working with us.
+
+Door one is a 45-minute strategy call with my team. 
+
+We diagnose where the bottleneck actually is in your business and lay out what working with us would look like. That's the right door if you're seriously considering it and want to know if there's a fit.
+Door two is smaller. A three-hour workshop. $27.
+In those three hours I walk you through how to package your expertise into a premium offer, how to structure it so you can deliver it to a group instead of one client at a time, and how to position it so the right people pay full price without negotiating. You leave with the offer actually built. Not theory. Built.
+If you've had a client based business for a few years you'll move through the workshop faster than most. The framework is designed for people exactly like you. 
+
+Workshop link: HERE
+Of if you're ready to book a call with us and learn more about Clients on Demand, click here.
+
+Either door is fine. The one I'd avoid is door three, where you sit with this for another six months and watch another year go by.
+Russ
+
+P.S. If you want a chance to get on a call with me personally, pick the VIP upgrade for the workshop and I'll see you on the other side!</pre></div><div class="email-block"><div class="email-meta">Email 7 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: What actually happens on the call</div><pre class="email-body">Hi {{contact.first_name}},
+
+If you've been thinking about booking a 45-minute call with my team but haven't yet, I want to demystify the whole thing. 
+
+Most people don't book because they don't know what they're agreeing to. So here it is.
+
+You book a 45-minute slot on our calendar. Before the call, my assistant sends you a custom prep kit with a few short videos. 
+
+They cover the most common questions you might be having before we talk.
+
+On the call itself, we'll ask you about your business. Your current model, your revenue, your client base, your goals. 
+
+We'll diagnose where the actual bottleneck is. 
+
+Most people on these calls discover at least one thing they didn't know about their own business in the first 20 minutes.
+
+The last 20% is one of two conversations. 
+
+If we think we can help, we'll explain what working with us would look like and you can decide whether to move forward. If we don't think we're a fit, we'll tell you that directly and point you toward something more useful for your particular situation. 
+
+Either way you walk away with a sharper read on your situation than 95% of experts in your field will ever get.
+
+That's the whole thing. No tricks. No high pressure.
+If that sounds like the kind of conversation you'd want, click the link here to reserve your spot.
+
+Russ</pre></div><div class="email-block"><div class="email-meta">Email 8 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: When the right model finally clicks</div><pre class="email-body">Hi {{contact.first_name}},
+
+By the time most experts come to us, they are not brand new.
+
+They have already tried things.
+
+They have bought programs.
+
+They have watched trainings.
+
+They have hired people.
+
+They have had moments where they thought, "Okay, maybe this is the thing that finally works."
+
+And then it didn't.
+
+That is part of what makes this client's story so meaningful to me.
+
+Here's what she wrote:
+
+The line that stands out to me is this:
+"when you've struggled for so long and then you FINALLY find some honest, solid, caring help…"
+
+That is not the kind of thing someone says because they learned a new marketing trick.
+
+That is what someone says when the weight finally comes off.
+
+Because for a lot of experts, the hardest part is not believing they can help people.
+
+They already know they can.
+
+The hard part is finding a business model that lets them help people without constantly burning themselves out, guessing what to do next, or wondering if they are being led in the wrong direction again.
+
+That is why we take this work seriously.
+
+When someone comes to us, they are trusting us with more than a funnel.
+
+They are trusting us with their future.
+Their reputation.
+Their clients.
+Their family.
+Their next chapter.
+
+And when it works, it can feel emotional.
+Not just because of the money.
+
+Because money is rarely just money.
+It can mean breathing room.
+
+Options.
+
+A business that finally feels stable.
+
+The ability to stop wondering if you should just give up and go back to something safer.
+
+So if you have been trying to figure this out for a while, and you are tired of piecing together advice that never seems to turn into the business you actually want, that is exactly the kind of conversation my team can have with you.
+
+We will look at where you are now, what you know, who you help, and whether your expertise can become a premium online program people are willing to pay for.
+
+Click here to book a call with my team.
+
+Russ</pre></div><div class="email-block"><div class="email-meta">Email 9 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: Three things you can do this week</div><pre class="email-body">Hi {{contact.first_name}},
+
+I want to give you three things you can actually do this week to move your business forward, whether or not we ever talk.
+
+One. Stop quoting your hourly rate.
+
+The moment you lead with your hourly rate, you make it easier for people to compare you to everyone else who sells time. That does not mean your rate is wrong. It means the frame is wrong. If the conversation is "$300 an hour," the buyer starts measuring the cost against hours. If the conversation is "here is the outcome, here is the process, here is the level of support, and here is the investment," they start measuring the cost against the result. That is the shift. You are not simply changing the way you describe your price. You are changing what the buyer believes they are buying.
+
+Two. Write down the three actual outcomes your best clients have ever achieved.
+
+Not your services. Not your modalities. The actual outcomes. The marriage that survived. The case that settled. The body that healed. The business that scaled. The person who got more confident. Those outcomes are what your future clients are buying, and almost no expert leads with them. Which is exactly why almost no expert charges what they're worth.
+
+Three. Run one experiment with a group format.
+
+If you've been delivering one-on-one your whole career, set up a single five-person group cohort and run it for six weeks at a price that lets you discover whether you actually enjoy the format. Most credentialed experts assume it will be more difficult for them. Then they try it and discover that the group produces better outcomes than the one-on-one ever did, because clients learn from each other in ways they couldn't learn from you alone.
+Those three things on their own will move your business meaningfully. They are roughly the first 10% of what we install when we work with somebody.
+
+If you want the other 90%, that's what the 45-minute call with my team is for. They'll look at your specific business and tell you what the full model looks like for you, in your field. Click here to book if you're ready to look under the hood.
+Russ
+
+P.S. If you implement any one of those three this week, hit reply and tell me which one. I read every response.</pre></div><div class="email-block"><div class="email-meta">Email 10 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: Three things you can do this week</div><pre class="email-body">Hi {{contact.first_name}},
+
+A short one.
+
+If you could clone yourself tomorrow and have the second version of you handle all of the client work, what would you actually do with the extra time?
+Don't answer instantly. Sit with it for thirty seconds.
+If the first answer that came up was something specific (a project you've been putting off for years, a relationship you've been neglecting, a version of your life you haven't visited since your twenties), then we have something to talk about.
+
+The 45-minute call with my team is where you find out if that's actually buildable for your specific situation. Ready to see what's possible? Click here.
+Russ
+
+P.S. The clients who get the most out of working with us are almost always the ones whose answer to the clone question is a specific thing they can name. Vague answers usually mean the wrong moment. Specific answers usually mean the right one.</pre></div><div class="email-block"><div class="email-meta">Email 11 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: Twelve months from today</div><pre class="email-body">Hi {{contact.first_name}},
+
+I want to walk you through two versions of what your next twelve months could look like.
+
+Scenario one. Twelve months from today, you're doing what you're doing now. Maybe a little better. You raised your rates again this year. You added some clients, lost some others. The work is still good. You're still respected in your field. And one morning you're sitting with your coffee, you do the math, and you realize that this year looks almost identical to last year. 
+
+That scenario isn't a disaster. It's a holding pattern. Holding patterns have a way of getting longer the more comfortable they become.
+
+Scenario two. Twelve months from today, you're delivering your expertise to a group of clients you genuinely want to work with, in a program you've priced at $5k to $15k. The hours you used to spend doing one-on-one delivery have collapsed into a few focused sessions a week. You can see your time clearly now. There's a Tuesday in October where you take your kids out of school for a week and nobody at your practice notices, because the practice doesn't depend on you being there.
+
+Scenario two is worth taking seriously because it isn't unusual. We've watched it happen over 6,000 times. The same way a therapist or an attorney or an accountant or a coach starts with one-on-one delivery, hits the ceiling, and quietly switches to a model that doesn't have their time as a variable.
+
+It isn't automatic. People who hire us put real work in. The work just produces compounding returns instead of linear ones, which is the whole point of building a business in the first place.
+
+If scenario two is the one you want, the way to start is a 45-minute conversation with my team. They'll look at your specific situation and tell you what the second scenario looks like for your work specifically, no matter what field you're in. You can book a call right here.
+Russ</pre></div><div class="email-block"><div class="email-meta">Email 12 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: "I love COD"</div><pre class="email-body">Hi {{contact.first_name}},
+
+I wanted to share a short review from one of our clients:
+
+What I want you to notice is the part most people would scroll past.
+
+He didn't say, "I love COD because it gave me a cute new idea."
+
+He said it was a game changer and life changer for him and for hundreds of COD clients.
+
+COD works best when you already have something real behind you.
+
+Real expertise.
+Real client experience.
+Real knowledge that can solve expensive problems for the right people.
+
+That is why so many experts tend to do so well with this model.
+
+You are not trying to become someone else.
+
+You are taking the depth you already have and turning it into a high-ticket offer people understand, want, and are willing to pay premium money for.
+
+That is the difference.
+
+Most experts do not need more expertise.
+
+They need a better business model around the expertise they already have.
+
+So if you have been wondering whether this could work for someone like you, Vadim's review is a pretty good answer.
+
+The 45-minute call with my team is right here.
+
+Russ</pre></div><div class="email-block"><div class="email-meta">Email 13 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: If one of these is what's holding you back</div><pre class="email-body">Hi {{contact.first_name}},
+
+I want to address the three things I hear most often from people who've watched the masterclass but haven't booked a call yet.
+
+The first is some version of "my field is different." Therapy isn't coaching. Law looks nothing like consulting. Medicine has its own rules. Accounting is its own world. The assumption underneath all those statements is that the model was designed for somebody slightly different than you. What most people don't see is that the piece we install isn't the part specific to your field. Your expertise is yours. The structure that lets your expertise reach more people without you working more hours is the same across credentialed professions. I've watched it work across all of them.
+
+The second is "I've tried programs like this before and they didn't work." You probably have. Most of them are bad. Most are designed for people who don't have a real practice yet, taught by people who don't have a real practice themselves, and they fall apart on contact with someone who actually knows what they're doing. Ours is different because we've been doing it for 13 years with proven experts, not beginners, and we built the methodology around what they actually need.
+
+The third is "I'm worried it'll feel like a sales pitch." It won't. The 45-minute call is mostly diagnosing your business. The last 20% is where we either talk about working together or we don't. If we're a fit, we'll tell you. If we're not, he'll tell you that too, and you walk away with an hour of real strategic thinking for free.
+If any one of those was the reason you hadn't booked, you have your answer.
+
+Toss in a call with us here, our calendar fills up pretty quick.
+Russ
+
+P.S. A fourth objection I hear less often but worth naming: "I want to talk to my partner first." That's a real and reasonable position, and you can have that conversation after the diagnostic call. Booking the call doesn't commit you to anything. It commits you to information.</pre></div><div class="email-block"><div class="email-meta">Email 14 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: The part of this you can't lose</div><pre class="email-body">Hi {{contact.first_name}},
+
+We say no to a lot of people.
+
+Sometimes the offer isn't ready yet. Sometimes the niche is too narrow. Sometimes the person genuinely isn't a fit for what we do. In those cases, we tell the person directly, point them toward something more useful, and we both move on.
+
+Here's what nobody mentions to you upfront. Even when we say no, the call has done real work. You will have spent 45 minutes with a senior strategist who has personally helped over 500 experts design six and seven-figure offers. He'll have looked at your specific business, identified the actual bottleneck, and given you a sharper read on your situation than 95% of others in your field will ever get.
+
+That's the worst-case outcome of booking a call. Forty-five minutes of strategic time from someone who is genuinely good at this, for free, with no obligation.
+
+The best-case outcome is that we figure out we're a fit, you decide to move forward, and twelve months from now your business looks structurally different than it does today. Group delivery instead of one-on-one. $5k to $15k programs instead of hourly billing. A schedule that doesn't own you.
+
+Both outcomes are useful. The one I'd avoid is the third one, where you sit with this question for another six months and never find out which outcome was waiting for you.
+
+Here's the link to book.
+
+Russ</pre></div><div class="email-block"><div class="email-meta">Email 15 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: The part of this you can't lose</div><pre class="email-body">Hi {{contact.first_name}},
+
+Short one.
+
+Clients on Demand isn't for everyone. 
+
+It's for the people who already have experience working with their clients. People who have already done the work to become genuinely good at what they do, and who have reached the point where being genuinely good at it isn't enough by itself to build the life they actually want.
+
+If that's you, we can probably help you turn what you know into a $5k to $15k online program you can deliver from anywhere in the world. Six thousand clients have done it. Thirteen years. The model works.
+
+If it's not you yet, that's fine. Come back in a couple of years.
+
+If it is you, the 45-minute call with my team is available right here.
+Russ
+
+P.S. The clients who get the most out of working with us are almost universally underestimating their own expertise. The deeper the expertise, the easier this gets. You've already done the hard part. You just haven't packaged it yet.</pre></div><div class="email-block"><div class="email-meta">Email 16 &middot; Wait 2 days &middot; From: Russ</div><div class="email-subject">Subject: Two people</div><pre class="email-body">Hi {{contact.first_name}},
+
+For 13 years I've watched two very specific kinds of people opt into masterclasses like the one you watched.
+
+The first person reads a few follow-up emails, recognizes themselves in the writing, thinks about booking a call, and then doesn't. They tell themselves they'll get to it next month. Next month becomes next quarter. The masterclass becomes a thing they vaguely remember watching. A year later they're still working the way they always worked, charging the way they always charged, building toward a ceiling they already know is real. Nothing terrible happens to person one. The life is fine. It's just unchanged.
+
+The second person reads a few follow-up emails, recognizes themselves in the writing, books the 45-minute call, has the conversation with Matt, and decides one way or the other. Sometimes they decide we're not a fit and they go a different direction with something useful in hand. More often they decide we are a fit, and twelve months later their business looks like a different business. They run a $5k to $15k program. They take Tuesdays off when their kids are out of school. They stopped doing the thing that was quietly eating them.
+Neither person is wrong. Person one is choosing the holding pattern. Person two is choosing the experiment. Both are choices.
+
+The only option that isn't a choice is the third one, where you leave the question open, the year passes, a different month rolls around, and you're still vaguely thinking about it. That isn't a decision. It's drift.
+
+Decide on purpose, whichever way you decide.
+
+If you've decided to take the step, the link to book a free consult is here. You'll walk away from it better than you started, whatever you choose afterward.
+
+I appreciate you watching the training.
+Russ
+
+P.S. The 6,000+ people who've trusted us with their businesses over the last 13 years were, at one point, exactly where you are right now. Sitting on a fence. Trying to decide whether to book a call. They aren't on the fence anymore. They're running businesses they actually love. Worth keeping in mind.</pre></div></span></div></div></details><p class="note" style="margin-top:16px">Click any row to expand. Green dot = details captured. Send screenshot + email copy to add details.</p></div></body></html>

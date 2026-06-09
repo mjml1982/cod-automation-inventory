@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+</style></head><body><div class="container">
+<header>
+<h1>COD Email &amp; Automation Inventory</h1>
+<p>For: Rehan &amp; Kas &nbsp;&middot;&nbsp; Generated: 2026-06-05 &nbsp;&middot;&nbsp; <strong style="color:#f0f6fc">167 workflows</strong> catalogued across 8 journeys</p>
+</header>
+<div class="honest-summary"><strong style="color:#e6edf3">Honest Summary:</strong> 167 workflows extracted from the COD GHL workflow spreadsheet.
+All available GHL URLs are included as clickable links so Kas can open any workflow directly.
+Workflow canvas screenshots and email copy are not yet captured &mdash; Rehan must open each GHL link to complete those fields per the <a href="https://cod-client.vercel.app/rehan-automation-inventory" target="_blank">build guide</a>.
+2 workflows have no URL in the source spreadsheet (flagged below).</div>
+<div class="gap-box"><h2>Gaps &amp; Flags</h2><ul><li><strong>Empty</strong> &mdash; no GHL URL (Set First Attributions / Lead Magnets > Voice Builder)</li><li><strong>ALL Workflows are inactive</strong> &mdash; no GHL URL ($27 Workshop Thanks Survey Submitted / Campaigns> Auto - COD - HTO Workshop > ARCHIVED)</li></ul></div><div class="journey-grid"><div class="journey-card">
+<h3>$27 Workshop</h3>
+<div class="count">20 workflows &nbsp;&middot;&nbsp; 16 live</div>
+<p>Workshop ticket purchase, event reminders, access, post-event follow-ups, and purchase success/failure flows.</p>
+<a href="workshop.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>VIP Upgrade</h3>
+<div class="count">10 workflows &nbsp;&middot;&nbsp; 8 live</div>
+<p>VIP upsell journey, VIP workshop access, pre/post event reminders for VIP buyers, weekly VIP reset.</p>
+<a href="vip.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Application / JIT</h3>
+<div class="count">28 workflows &nbsp;&middot;&nbsp; 22 live</div>
+<p>Application flow, JIT (just-in-time) registration chain, masterclass registrations, attribution tracking, and appointment booking.</p>
+<a href="application-jit.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Lions Pride Event</h3>
+<div class="count">6 workflows &nbsp;&middot;&nbsp; 6 live</div>
+<p>Live event ticket journey: confirmation, reminders, virtual events and aligned events.</p>
+<a href="lions-pride.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Enrollment</h3>
+<div class="count">14 workflows &nbsp;&middot;&nbsp; 14 live</div>
+<p>High-ticket coaching enrollment: payment received, contract signed, onboarding, course progress, ongoing coaching.</p>
+<a href="enrollment.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Cold Email Nurture</h3>
+<div class="count">3 workflows &nbsp;&middot;&nbsp; 3 live</div>
+<p>Nurture and booking automations for cold email leads, new lead pipelines, and call booking sequences.</p>
+<a href="cold-email.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Receipts / Transactional</h3>
+<div class="count">6 workflows &nbsp;&middot;&nbsp; 6 live</div>
+<p>Payment confirmations, refunds, opportunity tracking, and transactional system emails.</p>
+<a href="receipts.html" class="btn">View Journey &rarr;</a>
+</div><div class="journey-card">
+<h3>Other / Unsorted</h3>
+<div class="count">80 workflows &nbsp;&middot;&nbsp; 66 live</div>
+<p>Calls, operations, reporting, DND, events (non-LP), drafted/miscellaneous workflows needing journey assignment.</p>
+<a href="other.html" class="btn">View Journey &rarr;</a>
+</div></div><div class="proposed-box">
+<h2>Proposed / Not Yet Live</h2>
+<p>This section is reserved for Kas to fill in &mdash; automations discussed but not yet built in GHL.
+Do not add anything here based on current GHL state. Kas will complete this section after reviewing the inventory.</p>
+</div></div></body></html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Application / JIT - COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+
+details.wf-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+details.wf-card summary { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; font-size: .85rem; }
+details.wf-card summary::-webkit-details-marker { display: none; }
+details.wf-card summary:hover { background: #1c2128; }
+details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #30363d; }
+.wf-header-row { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; padding: 6px 14px; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: #8b949e; font-weight: 600; margin-bottom: 4px; }
+.wf-num { color: #6e7681; font-size: .8rem; }
+.wf-name { font-weight: 600; color: #e6edf3; }
+.wf-folder, .wf-subfolder { color: #8b949e; font-size: .82rem; }
+.wf-url { font-size: .78rem; }
+.wf-url a { color: #58a6ff; }
+.detail-dot { color: #3fb950; font-size: .6rem; vertical-align: middle; }
+.wf-detail { padding: 14px 18px; }
+.detail-pending { color: #6e7681; font-size: .83rem; font-style: italic; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: .85rem; }
+.detail-label { min-width: 110px; color: #8b949e; font-weight: 600; font-size: .78rem; text-transform: uppercase; padding-top: 2px; }
+.detail-val { color: #cdd9e5; flex: 1; }
+.email-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.email-meta { font-size: .75rem; color: #8b949e; margin-bottom: 4px; }
+.email-subject { font-weight: 600; color: #f0f6fc; margin-bottom: 8px; }
+.email-body { white-space: pre-wrap; font-size: .82rem; color: #cdd9e5; font-family: Arial, sans-serif; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.email-link { font-size: .78rem; color: #8b949e; margin-top: 6px; }
+.wf-screenshot { max-width: 100%; border-radius: 4px; border: 1px solid #30363d; margin-top: 6px; }
+</style></head><body><div class="container">
+<header><h1>COD Automation Inventory</h1><p>Prepared for Rehan &amp; Kas &mdash; 2026-06-05</p></header>
+<nav><a href="index.html">&larr; Back to Index</a></nav>
+<div class="section-header"><h2>Application / JIT</h2></div>
+<p style="color:#8b949e;font-size:.88rem;margin-bottom:16px">Application flow, JIT (just-in-time) registration chain, masterclass registrations, attribution tracking, and appointment booking.</p>
+<div class="summary-bar"><strong>28</strong> total &nbsp;&middot;&nbsp; <strong style="color:#3fb950">22</strong> live &nbsp;&middot;&nbsp; <strong style="color:#d29922">6</strong> draft/inactive &nbsp;&middot;&nbsp; <strong style="color:#58a6ff">22</strong> details captured</div>
+<div class="gap-box"><h2>Missing URLs</h2><ul><li>Empty</li></ul></div><div class="wf-header-row"><span class="wf-num">#</span><span class="wf-name">Workflow Name</span><span class="wf-folder">Folder</span><span class="wf-subfolder">Subfolder</span><span>Status</span><span>GHL URL</span></div><details class="wf-card"><summary><span class="wf-num">1</span><span class="wf-name">New Application Page</span><span class="wf-folder">New Application Page</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/346909d6-bc44-429d-ad49-7185eae9e769" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">2</span><span class="wf-name">Set First Attributions <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/1eef50c6-6db5-4b66-b7d5-e3c9acc1319c" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — called by other workflows via Add to Workflow step (no direct trigger)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Checks if FA Funnel and FA URL fields are empty. If both are empty, runs Update FA Fields step. If already set, ends immediately. Pure data/attribution logic — no emails.</span></div><div class="detail-row"><span class="detail-label">Called by</span><span class="detail-val">1. Registration DM - (codworkshop.com -&gt; GHL), 3. Appointment DM - (codworkshop.com -&gt; GHL), 1. Registration JIT - (codworkshop.com -&gt; GHL), 2. Application JIT - (codworkshop.com -&gt; GHL), 3. Appointment JIT - (codworkshop.com -&gt; GHL), 1. Application JV - Art of Charm, 2. Appointment JV - Art of Charm</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Acts as a shared attribution helper called by multiple workflows.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/set-first-attributions-overview.png" alt="Set First Attributions canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">3</span><span class="wf-name">1. Registration DM - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">DM</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/e60a3dea-56d5-4db5-8cb8-b791285fca95" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook from codworkshop.com when a DM registration occurs. Creates contact, updates Last Acquisition Fields, adds tags, waits, runs Set First Attributions, then adds contact to Registration Emails workflow.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions, Registration Emails (Add to Workflow — currently Disabled)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">The Add to Workflow step for Registration Emails is currently Disabled.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/registration-dm-overview.png" alt="1. Registration DM - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">4</span><span class="wf-name">3. Appointment DM - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">DM</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/4a341f4c-9d12-40bb-8045-9cb76dee4b79" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook from codworkshop.com when a DM appointment is booked. Creates contact, updates Last Acquisition Fields, waits, runs Set First Attributions, formats date/time, books appointment on Breakthrough Call (DM) - Clients On Demand calendar (Calendar Default team member, override availability OFF), adds tags, ends.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Books directly to the Breakthrough Call (DM) - Clients On Demand calendar using datetime formatter output.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/appointment-dm-overview.png" alt="3. Appointment DM - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">5</span><span class="wf-name">1. Registration JIT - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JIT</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/3e5d8030-850e-40a3-aece-0b80e601ab27" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook from codworkshop.com when a JIT registration occurs. Creates contact, updates Last Acquisition Fields, adds tags, waits, runs Set First Attributions, adds to Registration Emails workflow (active, not disabled), creates a spreadsheet row, ends.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions, Registration Emails (Add to Workflow — active)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Same structure as Registration DM but the Add to Workflow: Registration Emails step is active (not disabled). Also includes a Create Spreadsheet Row step at the end.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/registration-jit-overview.png" alt="1. Registration JIT - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">6</span><span class="wf-name">2. Application JIT - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JIT</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/d8094756-a92c-41f2-a28d-52383ab04a86" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook when a JIT application is submitted. Creates contact, updates Last Acquisition Fields, adds tags, waits, runs Set First Attributions, then removes contact from Registration Emails workflow and adds them to Application Emails workflow. This is the key JIT handoff — moves contact from registration sequence into application sequence.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions, Application Emails (Add to Workflow), Registration Emails (Remove from Workflow)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Critical chain step: explicitly removes contact from Registration Emails before adding to Application Emails. Ensures contact is not receiving both sequences simultaneously.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-jit-overview.png" alt="2. Application JIT - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">7</span><span class="wf-name">3. Appointment JIT - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JIT</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/7631eb9c-bca7-4439-b028-94543a6877f3" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook when a JIT appointment is booked. Creates contact, updates Last Acquisition Fields, waits, runs Set First Attributions, formats date/time, books appointment on Breakthrough Call (JIT) - Clients On Demand calendar (Calendar Default, override availability OFF), adds tags, then removes contact from both Registration Emails and Application Emails workflows.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions, Registration &amp; Application Emails (Remove from Workflow — both removed on appointment)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">End of the JIT chain. Removes contact from ALL email sequences (Registration and Application) once an appointment is booked. Uses Breakthrough Call (JIT) calendar — different from DM version which uses Breakthrough Call (DM).</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/appointment-jit-overview.png" alt="3. Appointment JIT - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">8</span><span class="wf-name">1. Application JV - Art of Charm <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JV - Art of Charm</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/28f2f829-aedc-4bce-af1b-3e80645f040e" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook for Art of Charm JV application. Creates contact, updates Last Acquisition Fields, adds tags, waits, runs Set First Attributions, ends. No email sequences or appointment booking — attribution and contact creation only.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Minimal JV intake workflow — no downstream email or booking steps beyond attribution.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-jv-aoc-overview.png" alt="1. Application JV - Art of Charm canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">9</span><span class="wf-name">2. Appointment JV - Art of Charm <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JV - Art of Charm</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/d27c94ce-ba75-48b1-8fcc-bfca701148eb" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook for Art of Charm JV appointment. Creates contact, updates Last Acquisition Fields, waits, runs Set First Attributions, formats date/time, books appointment on Breakthrough Call (Art Of Charm) - Clients On Demand calendar (Calendar Default, override availability OFF), adds tags, ends.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Set First Attributions</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Same structure as Appointment JIT/DM but uses the Art Of Charm-specific calendar: Breakthrough Call (Art Of Charm) - Clients On Demand.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/appointment-jv-aoc-overview.png" alt="2. Appointment JV - Art of Charm canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">10</span><span class="wf-name">AoC - Booking (Inactive) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">JV - Art of Charm</span><span class="badge inactive">INACTIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/7a26a711-344b-4920-a389-aea8e80d89d5" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Customer Booked Appointment — filter: Contact Mode is any of 'contact'. Enroll: Contact only.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">When an AoC customer books an appointment, adds a tag. Nothing else. Currently not live.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Minimal placeholder workflow — only step is Add Tag. Draft/inactive. May have been superseded by the 2. Appointment JV - Art of Charm webhook workflow.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/aoc-booking-overview.png" alt="AoC - Booking (Inactive) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">11</span><span class="wf-name">Lead Magnet Registration <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">Lead Magnets</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/c7a9a548-32ff-4d27-9eeb-6cebf1502455" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook when someone registers via a lead magnet. Creates contact and adds a lead magnet tag (lm-[tag]). No email sequences or further steps.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Very minimal — webhook fires, contact created, lm tag added, ends. No email follow-up built into this workflow.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/lead-magnet-registration-overview.png" alt="Lead Magnet Registration canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">12</span><span class="wf-name">Empty</span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">Lead Magnets &gt; Voice Builder</span><span class="badge live">LIVE</span><span class="wf-url"><span class="no-url">URL missing</span></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">13</span><span class="wf-name">Application Referral - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">Refer</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/d8431298-2ff8-44d0-a34f-cbdf9d6e8765" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook when a referral submits an application. Creates contact and adds tag: referral-application. No further steps.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Minimal referral intake — webhook, create contact, tag referral-application, end. No email or booking steps.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-referral-overview.png" alt="Application Referral - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">14</span><span class="wf-name">Appointment Referral - (codworkshop.com -&gt; GHL) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">Set First Attributions</span><span class="wf-subfolder">Refer</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/cee03751-cf2e-4b3d-95e1-1626de72e9cf" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Inbound Webhook (no filters applied) — fired from codworkshop.com</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Receives inbound webhook when a referral books an appointment. Creates contact, tags as referral-appointment, formats date/time, books on Breakthrough Call (Referral) - Clients On Demand calendar (Calendar Default, override OFF), sets GHL ID of original contact, then finds the contact. If found: creates spreadsheet row and sends Slack notification. If not found: ends.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Most complex referral workflow. Includes conditional branch (contact found/not found), spreadsheet logging, and Slack notification on successful booking. Uses a dedicated Referral calendar.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/appointment-referral-overview.png" alt="Appointment Referral - (codworkshop.com -&gt; GHL) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">15</span><span class="wf-name">1.1 - Registrations Emails (JIT) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">JIT &gt; 1. Registrations</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/e2442936-bcc7-4986-9d63-c887793bb15b" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — no direct trigger. Added by 1. Registration JIT - (codworkshop.com -&gt; GHL) via Add to Workflow step.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">JIT registration confirmation and follow-up sequence. Adds JIT Lead Tag, moves to Lead Stage, adds to SendGrid, sends 3 emails (immediately, +1 hour, +23 hours), then hands off to the 16-email Book A Call sequence.</span></div><div class="detail-row"><span class="detail-label">Called by</span><span class="detail-val">1. Registration JIT - (codworkshop.com -&gt; GHL)</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">2.2 - Book A Call (universal) KAMG</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">The Wait step before the final Add to Workflow handoff duration is not visible in screenshots — worth checking. Registration Email #1 sends immediately on enrollment.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/registrations-emails-jit-overview.png" alt="1.1 - Registrations Emails (JIT) canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Immediately &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 💰You're registered — here's your link</div><pre class="email-body">Hi {{contact.first_name}},
+
+You just registered — nice move.
+
+Your training is either available right now or just moments away. Either way, here's your personal link — bookmark it, because you'll want to come back to this:
+
+👉 Watch the Training HERE
+
+(If you're seeing a countdown, sit tight — it's almost time.)
+
+Inside, I'm going to walk you through the exact 5-step system that's helped over 6,000 coaches, therapists, doctors, and experts escape the "time for dollars" trap and build online programs that earn $5,000–$15,000 per client.
+
+This isn't theory. This is the same playbook behind $100M+ in high-ticket revenue — and it works whether you're a burnout coach, a functional medicine practitioner, a marriage therapist, attorney or any other expert who's done trading hours for income.
+
+Here's a glimpse of what you'll see inside:
+
+Why grinding on social media is actually the worst way to attract premium clients
+
+The simple 4-step funnel that takes someone from scrolling their feed to investing $5K–$15K in your program within 24–48 hours
+
+How to run your entire business in 5–10 hours a week from anywhere with a laptop and Wi-Fi
+
+The people who act on this fastest are always the ones who get the biggest results — so the moment it's live, go watch it.
+
+👉 Watch the Training Now
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 Hour &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 📞 Ready to build yours? Let's talk.</div><pre class="email-body">Hey {{contact.first_name}},
+
+Whether you caught the training or life got in the way — your replay link is ready and waiting:
+
+👉 Watch the Replay Now
+
+No countdown this time. Watch it at your own pace, on your own schedule.
+
+Inside you'll see the exact framework behind $100M+ in high-ticket revenue — and how experts just like you are packaging what they already know into online programs that earn $5,000–$15,000 per client.
+
+If you've already watched it — great. The natural next question is usually "but could this actually work for me and my business?"
+
+That's exactly what a strategy call is for.
+
+👉 Book a Call to Find Out
+
+But first, go watch the training if you haven't already. It'll make the call 10x more valuable.
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div><div class="email-block"><div class="email-meta">Email 3 &middot; Wait 23 Hours &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 30 minutes to map out your online program</div><pre class="email-body">Hey {{contact.first_name}},
+
+Let me be straightforward with you.
+
+You registered for this training for a reason. 
+
+Something in your current situation isn't working — whether that's the income ceiling, the burnout, the feeling that your expertise is worth more than your bank account shows.
+
+You've seen the framework. You know the model works. The only question left is whether it works for you and your specific situation.
+
+That's exactly what a strategy call is for.
+
+Want to discover how this could work directly for you and your business?
+
+👉 Book Your Call
+
+Here's what happens on the call:
+
+We look at your specific expertise and audience
+
+We map out what your online program could look like and what you could realistically charge for it
+
+We show you exactly what it would take to get your first $5K–$15K client
+
+It's free. It's focused. And it's the fastest way to go from "this looks interesting" to actually having a plan.
+
+👉 Book Your Call
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand
+
+P.S. Want to rewatch the training before your call? Here's your replay link: Watch the Replay</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">16</span><span class="wf-name">2.1 - Application Emails (JIT) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">JIT&gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/be2e00eb-1a59-4ccf-91df-3ce8f8a610db" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — no direct trigger. Added by 2. Application JIT - (codworkshop.com -&gt; GHL) via Add to Workflow step.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Abandoned booking recovery sequence for JIT applicants. Fires 30 mins after application, sends 2 chase emails to get the contact to complete their strategy call booking. Screenshot cut off — may have additional steps below Email #2.</span></div><div class="detail-row"><span class="detail-label">Called by</span><span class="detail-val">2. Application JIT - (codworkshop.com -&gt; GHL)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Ends after Email #2. No further steps or handoffs.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-emails-jit-overview.png" alt="2.1 - Application Emails (JIT) canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Wait 30 mins &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 👋 Did something get in the way?</div><pre class="email-body">Hey {{contact.first_name}},
+
+I noticed you started booking a strategy call with my team but didn't quite get to the finish line.
+
+No worries — life happens.
+
+If something got in the way, here's your link to pick up where you left off:
+
+👉 Complete Your Booking
+
+The fact that you started tells me you're ready to take the next step — and I don't want something as small as a missed click to get between you and a plan that could genuinely change the trajectory of your business.
+
+The call is free, it's focused, and by the end of it you'll know exactly what your version of this looks like.
+
+👉 Complete Your Booking
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 day &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 📞 Your strategy call is still waiting</div><pre class="email-body">Hey {{contact.first_name}},
+
+Yesterday you started booking a strategy call with my team.
+
+You filled out the application. You got that far. Which tells me you already know this is the right next step — you just haven't crossed the finish line yet.
+
+Here's the thing: that call exists for one reason. To answer the question you're probably still sitting with:
+
+"Could this actually work for me and my specific situation?"
+
+That's exactly what we figure out together on the call. We look at your expertise, your audience, and your goals — and we map out what your version of a $5K–$15K program looks like in practice.
+
+It's free. It's focused. And it only happens if you book it.
+
+Want to discover how this could work directly for you and your business?
+
+👉 Book Your Strategy Call Now
+
+If now genuinely isn't the right time, no problem — but if something specific is holding you back, reply to this email and let me know. I read every response.
+
+👉Book Your Strategy Call Now
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">17</span><span class="wf-name">1.1 - Registrations Emails <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 1. Registrations</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/06277d49-2472-475c-a77b-83861bd0d6cf" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Form submitted — Form is any of: Masterclass Form, Masterclass Form Inline</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Masterclass registration confirmation and follow-up sequence. Triggered by Masterclass Form submission. Adds tag, tracks Facebook events (disabled), moves to Lead Stage, adds to SendGrid, assigns to Franzi, sends 3 emails (immediately, +1 hour, +23 hours), then hands off to 16-email Book A Call sequence.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">2.2 - Book A Call (universal) KAMG</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">⚠ ISSUE: Assign to Franzi step has an error (orange ! indicator) — needs investigation. Two Facebook Event steps are Disabled. Different email copy from the JIT version despite same structure and timing.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/registrations-emails-masterclass-overview.png" alt="1.1 - Registrations Emails canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Immediately &middot; From: Russ Ruffino</div><div class="email-subject">Subject: ▶️ Your 5-Step Game Plan is ready (watch now)</div><pre class="email-body">Hi {{contact.first_name}},
+
+You just registered for the masterclass - nice move.
+
+Here's your link to watch it right now (bookmark this - you'll want to come back to it):
+
+👉 WATCH THE MASTERCLASS NOW
+
+Inside, I'm going to walk you through the exact 5-step system that's helped over 6,000 coaches, therapists, doctors, and experts escape the "time for dollars" trap and build online programs that earn $5,000-$15,000 per client.
+
+This isn't theory. This is the same playbook behind $100M+ in high-ticket revenue - and it works whether you're a burnout coach, a functional medicine practitioner, a marriage therapist, or any other expert who's tired of trading hours for income.
+
+Here's a taste of what you'll see inside:
+
+Why posting content and grinding on social media is actually the worst way to get premium clients
+
+The simple 4-step funnel that takes someone from scrolling social media to investing $5K-$15K in your program within 24-48 hours
+
+How to run your entire business in 5-10 hours a week from anywhere with a laptop and Wi-Fi
+
+Go watch it now while it's fresh. The people who act on this fastest are always the ones who get the biggest results.
+
+👉 CLICK HERE TO WATCH THE MASTERCLASS
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 Hour &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 💰 The $150/hour trap (and how to escape it)</div><pre class="email-body">Hey {{contact.first_name}},
+
+Let me paint a picture and tell me if it sounds familiar:
+
+You're good at what you do. Maybe great. Your clients get real results. But at the end of the month, you look at your bank account and think… "How is this all I have to show for it?"
+
+You're seeing clients one-on-one. Charging $100, $150, maybe $200 an hour. And every dollar you earn requires you to physically show up and deliver.
+
+Miss a week? Income drops. Take a vacation? Income drops. Get sick? You get the idea.
+
+That's the time-for-dollars trap — and it doesn't matter how talented you are. If your income is directly tied to your hours, you have a ceiling. And it's a low one.
+
+Here's what most experts don't realize:
+
+You don't need more clients. You don't need to work more hours. You need a different model.
+
+Inside the masterclass, I show you how to take everything you already know and package it into one online group program - one that actually gets your clients BETTER results than one-on-one - and charge $5,000–$15,000 per client for it.
+
+Not because you're inflating your prices. Because the model delivers more value, more accountability, and more transformation than an hour here and there ever could.
+
+If you haven't watched it yet, now's the time:
+
+WATCH THE FREE MASTERCLASS NOW
+
+And if you already started watching, go finish it. The best part is in the second half.
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div><div class="email-block"><div class="email-meta">Email 3 &middot; Wait 23 Hours &middot; From: Russ Ruffino</div><div class="email-subject">Subject: 🐹 The content hamster wheel is a lie</div><pre class="email-body">Hey {{contact.first_name}},
+
+Quick question:
+
+How many hours have you spent this month creating content, posting on social media, filming videos… hoping that eventually, someone would reach out and want to work with you?
+
+If the answer makes you cringe, you're not alone.
+
+Here's what the marketing gurus won't tell you: the "post content and build an audience" strategy is the SLOWEST, most unreliable path to getting premium clients.
+
+Think about it. You're competing with millions of creators for attention. The algorithm decides who sees your stuff. And even when someone does engage, there's no system to turn that attention into revenue.
+
+It's a hamster wheel. And the hamster never gets the cheese.
+
+Inside the masterclass, I show you the simple 4-step funnel we use instead - one that takes your dream clients from browsing social media to investing in your $5K-$15K program within 24-48 hours.
+
+No endless content creation. No praying for the algorithm. No chasing people who "need to think about it" for three weeks.
+
+Just a system that puts qualified, motivated buyers in front of you like clockwork.
+
+We used this exact system to scale Clients on Demand to $100M+ in revenue. And our clients use it every day to fill their programs without burning out on content creation.
+
+👉 CLICK HERE TO WATCH THE MASTERCLASS
+
+Stop guessing. Start using a system that actually works.
+
+Talk soon,
+Russ Ruffino
+Founder, Clients on Demand</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">18</span><span class="wf-name">1.2 - Registrations SMS <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 1. Registrations</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/b82a0a5b-700c-4b46-9fa7-c78ff174217a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Form submitted — Form is any of: Masterclass Form (same trigger as 1.1 - Registrations Emails)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">SMS companion to the email registration sequence. Runs in parallel — same Masterclass Form trigger. Adds contact to Manual Call workflow, sends masterclass link via SMS immediately, then a follow-up check-in SMS after 1 day.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">2. Manual Call (inactive)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">SMS-only workflow — no emails. Triggered by same Masterclass Form as 1.1 - Registrations Emails, so both run simultaneously on registration. Handoff to 2. Manual Call which is currently inactive.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/registrations-sms-overview.png" alt="1.2 - Registrations SMS canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Immediately &middot; From: {{location_owner.first_name}} from {{location.name}}</div><div class="email-subject">Subject: SMS (not email)</div><pre class="email-body">Hey {{contact.first_name}}, it's {{location_owner.first_name}} from {{location.name}}.
+
+Here's the link to access your free masterclass:
+
+https://clientsondemand.live/wf-training</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 Day &middot; From: </div><div class="email-subject">Subject: SMS (not email)</div><pre class="email-body">{{contact.first_name}}, are you still looking {{ custom_values.marketing_outcome }}?</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">19</span><span class="wf-name">2. Manual Call  (inactive) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 1. Registrations</span><span class="badge inactive">INACTIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/005f038f-eb41-43dd-b190-2c5992cef6f2" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — added by 1.2 - Registrations SMS via Add to Workflow step.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Single-step workflow that queues a Manual Call task for the contact. Currently inactive/draft.</span></div><div class="detail-row"><span class="detail-label">Called by</span><span class="detail-val">1.2 - Registrations SMS</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">⚠ 917 contacts are currently sitting at the Manual Call step with no one processing them — workflow is inactive/draft. This is a significant gap: nearly 1,000 leads are stuck here. Needs decision: reactivate and work the queue, or remove this step from 1.2 - Registrations SMS.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/manual-call-overview.png" alt="2. Manual Call  (inactive) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">20</span><span class="wf-name">3. Nurture Sequence (inactive) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 1. Registrations</span><span class="badge inactive">INACTIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/e7bb0614-dd72-4304-9767-5e2f1184ce25" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">None — no trigger set.</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Incomplete nurture sequence — 2 emails with placeholder bodies never written. Inactive/draft with no trigger set.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">⚠ Unfinished workflow — both email bodies contain [INSERT EMAIL HERE] placeholders. No trigger set, never activated. Needs decision: write the emails and activate, or delete.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/nurture-sequence-overview.png" alt="3. Nurture Sequence (inactive) canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Wait 1 Day &middot; From: </div><div class="email-subject">Subject: it's done…</div><pre class="email-body">[INSERT EMAIL HERE] — placeholder, email body not written</pre></div><div class="email-block"><div class="email-meta">Email 2 &middot; Wait 1 Day &middot; From: </div><div class="email-subject">Subject: want me to personally help you {{custom_values.marketing_outcome}}?</div><pre class="email-body">[INSERT EMAIL HERE] — placeholder, email body not written</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">21</span><span class="wf-name">Application -&gt; Google Sheet</span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/3c6715d9-2111-4d2e-a633-1546d92d7245" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">22</span><span class="wf-name">Application Survey - Bounced <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/ee3740a3-5774-458a-9fab-bc2b4b5d4fcc" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Survey submitted — Survey is: Application Survey, filter: Disqualified is true</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Fires when an application survey is submitted and the contact is marked Disqualified. Adds an unqualified tag, waits 5 minutes, sends a polite rejection email with a free resource vault link, then finds and updates the most recently created opportunity to Application Unqualified status — whether or not an opportunity exists.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Rejection path for disqualified applicants. Both branches (opportunity found / not found) update to Application Unqualified status. Resource vault link: https://clientsondemand.live/vault</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-survey-bounced-overview.png" alt="Application Survey - Bounced canvas" class="wf-screenshot"></span></div><div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="email-block"><div class="email-meta">Email 1 &middot; Wait 5 Minutes &middot; From: Russ Ruffino</div><div class="email-subject">Subject: Thanks for applying {{contact.first_name}}</div><pre class="email-body">Hi {{contact.first_name}},
+
+Thank you for filling out the form and sharing more about yourself and your goals.
+
+After reviewing your information, we may not be the best fit to help you now.
+
+That said, we've put together thousands of dollars worth of training here for you to ensure you can keep moving forward:
+
+https://clientsondemand.live/vault
+
+While we may not be able to work together directly right now, we're committed to supporting you on your journey in any way we can.
+
+If you have any questions or want to explore these resources further, please reply to this email.
+
+I'd be happy to point you in the right direction!
+
+Wishing you the best,
+Russ Ruffino</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">23</span><span class="wf-name">Application Survey - Qualified</span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/af985a97-5b79-41f3-909a-eaa16c9c533d" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">24</span><span class="wf-name">Application Survey - Started (Draft) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/5244b5f8-84ae-42af-a0ca-60e8a1408585" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Contact Created (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">When a contact is created, checks if the source contains 'application survey : Partial Creation'. If true, updates the opportunity status to Application Started. If false, ends immediately. Designed to track partial/incomplete application survey submissions as a pipeline stage.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Draft/inactive — not currently running. Intended to capture partial application completions and move the opportunity to 'Application Started' stage. The broad trigger (Contact Created, no filters) could enroll unrelated contacts if activated without adding filters.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-survey-started-overview.png" alt="Application Survey - Started (Draft) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">25</span><span class="wf-name">Application Survey - Submitted -&gt; Note <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/0ee2f38f-9697-45bc-acd7-fea08e5cb19a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Survey submitted (2 parallel triggers):
+1. Survey Submitted - VSL — Survey is: Application Survey - Masterclass
+2. Application Survey Submitted — Survey is: Application Survey</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Fires on application survey submission. Adds Application Submitted tag, creates a contact note with all survey answers (audience, problem, challenges, revenue, ad willingness), then tags the contact as either Control or Variation based on whether the Funnel field contains 'control'. Used for A/B testing tracking.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">A/B test tagging: Funnel contains 'control' → Application Control Tag; else → Application Variation Tag. Note trigger naming inconsistency: 'Survey Submitted - VSL' trigger name but filter is Application Survey - Masterclass. Note content captures 5 survey fields:
+- application_audience (expert type)
+- application_problem (who they help + problem + solution)
+- what_are_the_biggest_challenges_in_your_business_right_now_check_all_that_apply
+- application_revenue (monthly revenue)
+- application_willingness_radio (willingness to spend on ads)</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-survey-submitted-note-overview.png" alt="Application Survey - Submitted -&gt; Note canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">26</span><span class="wf-name">IG - DM &amp; COMMENT - "MASTERCLASS" (Drafted) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Organic</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/081ef372-717a-4cf2-996a-0a99d88c701c" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">2 parallel triggers:
+1. Instagram Comment - 'KEYWORD' — IG post comment, Post Type: published, Contains phrase: KW
+2. Instagram DM - 'KEYWORD' — Customer replied via Instagram DM, Message body contains phrase: MASTERCLASS</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Instagram lead capture automation. Fires when someone comments or DMs 'MASTERCLASS' on Instagram. Branches by DM vs Comment. Collects email and first name via conversational DM if not on file, validates both with intent detection. If intent is Positive: adds Lead Small Tag, adds to Registration Emails, sends masterclass link via IG DM ('I just sent you the free masterclass via email'). Multiple Go To loop-backs re-ask for name/email if contact doesn't reply. Negative intent paths end the conversation.</span></div><div class="detail-row"><span class="detail-label">Hands off to</span><span class="detail-val">Registration Emails (Add to Registration Emails on positive intent)</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Draft/inactive — not yet live. Very complex: multiple conditional branches, Go To loop-backs, intent detection (Positive/Yes vs Negative). One of the most sophisticated workflows in the account. The keyword filter on the Comment trigger shows 'KW' — confirm if the actual keyword is 'MASTERCLASS' or something else.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/ig-dm-comment-masterclass-overview.png" alt="IG - DM &amp; COMMENT - "MASTERCLASS" (Drafted) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">27</span><span class="wf-name">Email Appointment</span><span class="wf-folder">Call No Showed</span><span class="wf-subfolder">Opportunity Source Updates</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/303f6107-5fd9-4f1a-94c7-d078e38d2297" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+<div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">
+  <strong>Customer Booked Appointment</strong> &mdash; Contact Mode is any of &ldquo;contact&rdquo; &middot; In calendar group = <em>Calls</em> &middot; utm_source contains phrase &ldquo;email&rdquo; + 1 more filter
+</span></div>
+<div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only (guests added after booking won&rsquo;t be enrolled)</span></div>
+<div class="detail-row"><span class="detail-label">Purpose</span><span class="detail-val">Tracks when a contact books a call via an email link &mdash; creates or updates the opportunity record so the source is captured correctly.</span></div>
+<div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val">
+  <ol style="padding-left:16px;margin:0;line-height:2">
+    <li><strong>Find opportunity</strong> &mdash; looks up existing opportunity for the contact:
+      <ul style="padding-left:16px;margin:4px 0;line-height:1.8">
+        <li><strong>Opportunity Found</strong> &rarr; Create or update opportunity &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; END</li>
+      </ul>
+    </li>
+  </ol>
+</span></div>
+<div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val" style="color:#8b949e;font-style:italic">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">28</span><span class="wf-name">JIT Landing Page Appointment [TBD] (drafted)</span><span class="wf-folder">Call No Showed</span><span class="wf-subfolder">Opportunity Source Updates</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/4bdde904-03f5-4a83-9da9-c42cf816a016" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+<div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">
+  <strong>Customer Booked Appointment</strong> &mdash; Contact Mode is any of &ldquo;contact&rdquo; &middot; In calendar group = <em>Calls</em> &middot; utm_source contains phrase &ldquo;email&rdquo; + 1 more filter
+</span></div>
+<div class="detail-row"><span class="detail-label">Status</span><span class="detail-val"><span class="badge draft">DRAFT</span> &mdash; TBD, not yet published</span></div>
+<div class="detail-row"><span class="detail-label">Purpose</span><span class="detail-val">Planned equivalent of <em>Email Appointment</em> but for JIT landing page bookings &mdash; will track opportunity source when a contact books via the JIT page.</span></div>
+<div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val">
+  <ol style="padding-left:16px;margin:0;line-height:2">
+    <li><strong>Find opportunity</strong>:
+      <ul style="padding-left:16px;margin:4px 0;line-height:1.8">
+        <li><strong>Opportunity Found</strong> &rarr; Create or update opportunity &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; END</li>
+      </ul>
+    </li>
+  </ol>
+</span></div>
+<div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val" style="color:#8b949e;font-style:italic">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">29</span><span class="wf-name">#JIT - Workshop Registration (FREE)</span><span class="wf-folder"><span class="no-url">&mdash;</span></span><span class="wf-subfolder"><span class="no-url">&mdash;</span></span><span class="badge">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/88c2491c-9b75-44e3-a5f1-a296bc1af056" target="_blank">Open in GHL &nearr;</a></span></summary>
+<div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Form Submitted &middot; Trigger name: &ldquo;Form Submitted&rdquo; &middot; Form is = &ldquo;FREE Webinar Registration Form (JIT)&rdquo; &middot; <em>(Draft &mdash; not published)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: &ldquo;auto-workshop-free-jit&rdquo;</li>
+    <li>Send Email Test &middot; Subject: &ldquo;Webinar Link Test&rdquo; &middot; Body: &ldquo;Here&rsquo;s your link to the webinar: Join Workshop!&rdquo; <em>(test/placeholder email)</em></li>
+    <li>Wait 3.5 hrs &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">&ldquo;Webinar Link Test&rdquo; &mdash; placeholder/test email with workshop access link</span></div>
+</div></details>
+<p class="note" style="margin-top:16px">Click any row to expand. Green dot = details captured. Send screenshot + email copy to add details.</p></div></body></html>
