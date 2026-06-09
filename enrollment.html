@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Enrollment - COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+
+details.wf-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+details.wf-card summary { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; font-size: .85rem; }
+details.wf-card summary::-webkit-details-marker { display: none; }
+details.wf-card summary:hover { background: #1c2128; }
+details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #30363d; }
+.wf-header-row { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; padding: 6px 14px; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: #8b949e; font-weight: 600; margin-bottom: 4px; }
+.wf-num { color: #6e7681; font-size: .8rem; }
+.wf-name { font-weight: 600; color: #e6edf3; }
+.wf-folder, .wf-subfolder { color: #8b949e; font-size: .82rem; }
+.wf-url { font-size: .78rem; }
+.wf-url a { color: #58a6ff; }
+.detail-dot { color: #3fb950; font-size: .6rem; vertical-align: middle; }
+.wf-detail { padding: 14px 18px; }
+.detail-pending { color: #6e7681; font-size: .83rem; font-style: italic; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: .85rem; }
+.detail-label { min-width: 110px; color: #8b949e; font-weight: 600; font-size: .78rem; text-transform: uppercase; padding-top: 2px; }
+.detail-val { color: #cdd9e5; flex: 1; }
+.email-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.email-meta { font-size: .75rem; color: #8b949e; margin-bottom: 4px; }
+.email-subject { font-weight: 600; color: #f0f6fc; margin-bottom: 8px; }
+.email-body { white-space: pre-wrap; font-size: .82rem; color: #cdd9e5; font-family: Arial, sans-serif; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.email-link { font-size: .78rem; color: #8b949e; margin-top: 6px; }
+.wf-screenshot { max-width: 100%; border-radius: 4px; border: 1px solid #30363d; margin-top: 6px; }
+</style></head><body><div class="container">
+<header><h1>COD Automation Inventory</h1><p>Prepared for Rehan &amp; Kas &mdash; 2026-06-05</p></header>
+<nav><a href="index.html">&larr; Back to Index</a></nav>
+<div class="section-header"><h2>Enrollment</h2></div>
+<p style="color:#8b949e;font-size:.88rem;margin-bottom:16px">High-ticket coaching enrollment: payment received, contract signed, onboarding, course progress, ongoing coaching.</p>
+<div class="summary-bar"><strong>14</strong> total &nbsp;&middot;&nbsp; <strong style="color:#3fb950">14</strong> live &nbsp;&middot;&nbsp; <strong style="color:#d29922">0</strong> draft/inactive &nbsp;&middot;&nbsp; <strong style="color:#58a6ff">0</strong> details captured</div>
+<div class="wf-header-row"><span class="wf-num">#</span><span class="wf-name">Workflow Name</span><span class="wf-folder">Folder</span><span class="wf-subfolder">Subfolder</span><span>Status</span><span>GHL URL</span></div><details class="wf-card"><summary><span class="wf-num">1</span><span class="wf-name">GHL Onboarding Call Booked</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/4170f3f5-2c0e-45b1-8bde-3c7e0caf5c9f" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Appointment Status = confirmed &middot; Event Type = Normal &middot; In calendar = COD App Onboarding Call</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>MAKE - Edit Custom Values (Make/Integromat webhook)</li>
+    <li>NEW SAAS ONBOARDING (Slack notification)</li>
+    <li>Add Onboarding Call Booked Tag</li>
+    <li>Remove from New Sale Workflow &rarr; removes from: 2. New Sale</li>
+    <li>Move to Onboarding Booked (pipeline stage move)</li>
+    <li>Internal Push Notification</li>
+    <li>Internal Email Notification</li>
+    <li>Confirmation Email</li>
+    <li>Wait: 24 Hours before the appointment</li>
+    <li>24 hr Reminder Email</li>
+    <li>Wait: 1 Hour before the appointment</li>
+    <li>1hr Reminder Email</li>
+    <li>1hr Reminder SMS</li>
+    <li>Wait: 10 mins before the appointment</li>
+    <li>10 Min Reminder Email</li>
+    <li>10 min Reminder SMS &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Removes from: <em>2. New Sale</em></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="detail-pending">Email &amp; SMS content not yet captured &mdash; to be added.</div></span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">2</span><span class="wf-name">Coaching - Course Progress</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching &gt; Course Progress</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/41d19735-83ab-453c-bc83-0f932660b996" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Lesson Started &middot; Product is any of &ldquo;Coaching&rdquo;</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Update Category &amp; Lesson (update contact field) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">3</span><span class="wf-name">Coaching - Week 1</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching &gt; Course Progress</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/a4b2177a-aacf-47dd-9b9b-2ab255e5c0f7" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Category Started &middot; Trigger name: &ldquo;Week 1 Started&rdquo; &middot; Product is any of &ldquo;Coaching&rdquo; &middot; Category is any of [Week 1 category ID]</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Move to Week 1 &rarr; Pipeline: 2. Clients Pipeline &middot; Stage: Week 1 &middot; Opportunity name: {{contact.name}} &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">4</span><span class="wf-name">Coaching - Week 2</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching &gt; Course Progress</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/9b4bc289-6932-4bca-bf79-9e34668d43ad" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Category Started &middot; Trigger name: &ldquo;Week 2 Started&rdquo; &middot; Product is any of &ldquo;Coaching&rdquo; &middot; Category is any of [Week 2 category ID]</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Move to Week 2 &rarr; Pipeline: 2. Clients Pipeline &middot; Stage: Week 2 &middot; Opportunity name: {{contact.name}} &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">5</span><span class="wf-name">1. Coaching - Payment Received</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/b1951e28-4e82-453a-8a12-a08de6f97b46" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val"><ul>
+    <li>Payment Received &middot; <strong>Coaching @ Three Pay</strong> &middot; Global Product = Coaching &middot; Payment Status = Success</li>
+    <li>Payment Received &middot; <strong>Coaching @ Split Pay</strong> &middot; Global Product = Coaching &middot; Payment Status = Success</li>
+    <li>Payment Received &middot; <strong>Coaching @ Paid In Full</strong> &middot; Global Product = Coaching &middot; Payment Status = Success</li>
+  </ul></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: Coaching Onboarding Paid</li>
+    <li>Send Coaching Contract (Send documents &amp; contracts &middot; Template: Coaching Contract &middot; From: Maxime Warnault &middot; Send Directly &middot; Channel: Email)</li>
+    <li>Find Opportunity</li>
+    <li>Branch on opportunity lookup result:
+      <ul>
+        <li><strong>Opportunity Found</strong> &rarr; Move to Payment Received (Pipeline: 2. Clients Pipeline &middot; Stage: Payment Received) &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; Move to Payment Received (Pipeline: 2. Clients Pipeline &middot; Stage: Payment Received) &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><div class="detail-pending">Contract &amp; email content not yet captured &mdash; to be added.</div></span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">6</span><span class="wf-name">2. Coaching - Contract Signed</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/ebdcdf6d-08f2-4376-9b47-ba2c922e3124" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Documents &amp; Contracts &middot; Trigger name: &ldquo;Coaching Contract Signed&rdquo; &middot; Template = Coaching Contract &middot; Recipient type = Contact &middot; Status = Signed/Accepted</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: Coaching Onboarding Signed</li>
+    <li>Remove from Payment Received (removes from <em>1. Coaching - Payment Received</em> workflow)</li>
+    <li>Welcome Email</li>
+    <li>Find Opportunity</li>
+    <li>Branch on opportunity lookup result:
+      <ul>
+        <li><strong>Opportunity Found</strong> &rarr; Move to Contract Signed (Pipeline: 2. Clients Pipeline &middot; Stage: Contract Signed) &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; Create into Contract Signed (Pipeline: 2. Clients Pipeline &middot; Opportunity Name: {{contact.name}} &middot; Stage: Contract Signed) &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Removes from: <em>1. Coaching - Payment Received</em></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <div class="email-block">
+      <div class="email-meta">Email &middot; Welcome Email &middot; Step 3</div>
+      <div class="email-subject">Subject: Welcome Aboard! &#x1F680;</div>
+      <pre class="email-body">{{contact.first_name}},
+
+Let me kick this off by saying CONGRATULATIONS &amp; welcome to {{location.name}}!
+
+We are very thrilled to partner with you to help you {{custom_values.marketing_outcome}}.
+
+I am so excited to see the impact we can both make on the world TOGETHER.
+
+However, our output is only as good as the input you provide us with...
+
+That&apos;s why it&apos;s very important for you to understand that you need to do some behind-the-scenes work, trust the process, make your time available to us, and provide us with as much information and content as you can, in order to help us get you the best results possible.
+
+Now, let&apos;s get to the nuts and bolts and execute, shall we?
+
+Everything you need to get started is in the link below.
+
+We HIGHLY recommend you do this on your laptop / desktop / computer. Do NOT do this on mobile as it will be way harder for you to get access to the software you need.
+
+{{custom_values.domain_name}}{{ custom_values.onboarding_page }}
+
+Give our automations 10 to 15 minutes to send you access before you start taking action. Once you get them, be sure to set aside 10 minutes maximum to watch the videos and go through the process.
+
+If you get stuck, let us know and we&apos;ll guide you through it.
+
+Again, congratulations to you for making this extraordinary decision.
+
+Of course, there&apos;s work involved, there&apos;s always work involved. But as you know, that&apos;s just a part of the game.
+
+We can promise you that we will give you our all, as long as you can promise to stay compliant with your part of the responsibilities.
+
+Cheers to you {{contact.first_name}}, to us, and to where we&apos;re going!
+
+Let&apos;s win,
+{{location_owner.first_name}} {{location_owner.last_name}}</pre>
+    </div>
+  </span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">7</span><span class="wf-name">3. Coaching - Onboarding Form</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/29b193f4-45de-4f2a-bc17-c704643832ba" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Survey Submitted &middot; Survey is any of &ldquo;Coaching - Onboarding Survey&rdquo;</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: Coaching Onboarding Submitted</li>
+    <li>Find Opportunity (Most recently created &middot; Opportunity Name contains {{contact.name}})</li>
+    <li>Branch on opportunity lookup result:
+      <ul>
+        <li><strong>Opportunity Found</strong> &rarr; Move to Onboarding Survey Submitted (Update opportunity &middot; Pipeline: 2. Clients Pipeline &middot; Stage: Onboarding Survey Submitted) &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; Move to Onboarding Survey Submitted (Create opportunity &middot; Pipeline: 2. Clients Pipeline &middot; Stage: Onboarding Survey Submitted) &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">8</span><span class="wf-name">4. Coaching - Onboarding Call - Booked</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/4862edbf-58ae-40fd-9bcf-cf039e6f3840" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Appointment Status &middot; Trigger name: &ldquo;Onboarding Call Booked&rdquo; &middot; Event Type = Normal &middot; Appointment status = confirmed &middot; In calendar = COD App Onboarding Call</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: Coaching Onboarding Booked</li>
+    <li>Find Opportunity</li>
+    <li>Branch on opportunity lookup result:
+      <ul>
+        <li><strong>Opportunity Found</strong> &rarr; Move to Onboarding Call Booked (Update opportunity &middot; Pipeline: 2. Clients Pipeline &middot; Stage: Onboarding Call Booked) &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; Move to Onboarding Call Booked (Create opportunity &middot; Pipeline: 2. Clients Pipeline &middot; Opportunity Name: {{contact.name}} &middot; Stage: Onboarding Call Booked) &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">9</span><span class="wf-name">4.1 Coaching - Onboarding Call - Showed</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/88136716-ab1a-48b3-a2ad-d6aa51fde8ea" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Appointment Status &middot; Trigger name: &ldquo;Onboarding Call Showed&rdquo; &middot; Event Type = Normal &middot; Appointment status = Showed &middot; In calendar = COD App Onboarding Call</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: Coaching Onboarding Showed</li>
+    <li>Find Opportunity</li>
+    <li>Branch on opportunity lookup result:
+      <ul>
+        <li><strong>Opportunity Found</strong> &rarr; Move to Onboarding Call Completed (Update opportunity &middot; Pipeline: 2. Clients Pipeline &middot; Stage: Onboarding Call Completed) &rarr; END</li>
+        <li><strong>Opportunity Not Found</strong> &rarr; Create Opportunity (Pipeline: 2. Clients Pipeline &middot; Opportunity Name: {{contact.name}} &middot; Stage: Onboarding Call Completed) &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">10</span><span class="wf-name">5. Coaching - Point Of Sale</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/cab1a70b-bdbe-4f0b-a196-086b814c02bd" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Contact Changed &middot; Trigger name: &ldquo;Sales Call Outcome Has Changed&rdquo; &middot; Sales Call Outcome has changed &middot; Offer Sold has changed to &ldquo;Coaching&rdquo;</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Remove from Showed Calls &rarr; removes from: Discovery Call - Showed, Follow-Up Call - Showed</li>
+    <li>Add to Coaching - Client Management workflow</li>
+    <li>Add Coaching Client Tag</li>
+    <li>Move to Enrolled (Create/Update opportunity &middot; Pipeline: 1. Sales Pipeline &middot; Stage: Enrolled &middot; Opportunity Name: {{contact.name}})</li>
+    <li>FB Conversion API</li>
+    <li>Grant Coaching Channel Access</li>
+    <li>Course Coaching Offer</li>
+    <li>New Client Internal Notification (internal push notification to team)</li>
+    <li>Welcome Email</li>
+    <li>Custom Automation (Webhook &middot; POST &middot; https://webhookurl.com/xxxxxx) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Removes from: <em>Discovery Call - Showed</em>, <em>Follow-Up Call - Showed</em>. Adds to: <em>Coaching - Client Management</em></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <div class="email-block">
+      <div class="email-meta">Internal Push Notification &middot; New Client Internal Notification &middot; Step 8</div>
+      <div class="email-subject">Subject: &#x1F4F2; New Client</div>
+      <pre class="email-body">Hey team,
+
+We have a new client, let&apos;s go &#x1F973;
+
+Here&apos;s the client information:
+
+Business Name - {{contact.company_name}}
+Full Name - {{contact.name}}
+Email - {{contact.email}}
+Phone - {{contact.phone}}
+
+Here&apos;s the offer information:
+
+Offer Sold - {{contact.sale_offer_sold}}
+Cash Collected - {{contact.sale_cash_collected}}
+Total Revenue - {{contact.sale_revenue}}
+Payment Terms - {{contact.sale_outcome}}
+Billing Notes - {{contact.sale_billing_notes}}
+Delivery Notes - {{contact.sale_notes}}
+
+Here&apos;s the team information:
+
+Setter - {{contact.sale_setter}}
+Closer - {{contact.sale_closer}}
+Coach - {{contact.sale_account_manager}}</pre>
+    </div>
+    <div class="email-block">
+      <div class="email-meta">Email &middot; Welcome Email &middot; Step 9</div>
+      <div class="email-subject">Subject: Welcome Aboard! &#x1F680;</div>
+      <pre class="email-body">{{contact.first_name}},
+
+Let me kick this off by saying CONGRATULATIONS &amp; welcome to {{location.name}}!
+
+We are very thrilled to partner with you to help you {{custom_values.marketing_outcome}}.
+
+I am so excited to see the impact we can both make on the world TOGETHER.
+
+However, our output is only as good as the input you provide us with...
+
+That&apos;s why it&apos;s very important for you to understand that you need to do some behind-the-scenes work, trust the process, make your time available to us, and provide us with as much information and content as you can, in order to help us get you the best results possible.
+
+Now, let&apos;s get to the nuts and bolts and execute, shall we?
+
+Everything you need to get started is in the link below.
+
+We HIGHLY recommend you do this on your laptop / desktop / computer. Do NOT do this on mobile as it will be way harder for you to get access to the software you need.
+
+{{custom_values.domain_name}}{{ custom_values.onboarding_page }}
+
+Give our automations 10 to 15 minutes to send you access before you start taking action. Once you get them, be sure to set aside 10 minutes maximum to watch the videos and go through the process.
+
+If you get stuck, let us know and we&apos;ll guide you through it.
+
+Again, congratulations to you for making this extraordinary decision.
+
+Of course, there&apos;s work involved, there&apos;s always work involved. But as you know, that&apos;s just a part of the game.
+
+We can promise you that we will give you our all, as long as you can promise to stay compliant with your part of the responsibilities.
+
+Cheers to you {{contact.first_name}}, to us, and to where we&apos;re going!
+
+Let&apos;s win,
+{{location_owner.first_name}} {{location_owner.last_name}}</pre>
+    </div>
+  </span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">11</span><span class="wf-name">Coaching - Client Feedback Survey</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/cc80721f-8a15-485b-a15d-79648e6ba4eb" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Survey Submitted &middot; Trigger name: &ldquo;Client Feedback Survey Submitted&rdquo; &middot; Survey is &ldquo;Coaching - Client Feedback Survey&rdquo;</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Days Active (calculate days active via datetime formatter)</li>
+    <li>Add Client Feedback Survey to Notes (adds structured survey results as a contact note) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <div class="email-block">
+      <div class="email-meta">Note &middot; Add Client Feedback Survey to Notes &middot; Step 2</div>
+      <pre class="email-body">CLIENT FEEDBACK SURVEY ({{datetime_formatter.1.days}} DAYS)
+
+Overall Satisfaction - {{contact.client_survey_satisfaction}}
+Communication - {{contact.client_survey_communication}}
+Progress - {{contact.client_survey_progress}}
+Recommendations - {{contact.client_survey_nps}}
+
+Achievements:
+{{contact.client_survey_achievement}}
+
+Priorities:
+{{contact.client_survey_next_steps}}
+
+Support:
+{{contact.client_survey_support}}
+
+What we&apos;re doing well:
+{{contact.client_survey_good}}
+
+What we could improve:
+{{contact.client_survey_bad}}
+
+Anything Else:
+{{contact.client_survey_anything_else}}</pre>
+    </div>
+  </span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">12</span><span class="wf-name">Coaching - Client Management</span><span class="wf-folder">GHL Onboarding Call Booked</span><span class="wf-subfolder">Clients &gt; Coaching</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/1658c4d8-8bfd-437d-9a4f-ac9fdb7f82ff" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Added to workflow (enrolled via <em>5. Coaching - Point Of Sale</em> &ldquo;Add to Coaching - Client Management&rdquo; step)</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Wait: Next Monday - Week 1</li>
+    <li>Coaching Week 1 (update contact coaching week field)</li>
+    <li>Wait: Week 2</li>
+    <li>Coaching Week 2 (update contact)</li>
+    <li>Week 2 - Internal Notification (push notification to coach)</li>
+    <li>Wait: Week 3</li>
+    <li>Coaching Week 3 (update contact)</li>
+    <li>Week 3 - Internal Notification (push notification to coach)</li>
+    <li>Wait: Week 4</li>
+    <li>Coaching Week 4 (update contact)</li>
+    <li>Client Feedback Survey (30 Days) &mdash; email to client</li>
+    <li>Wait: Week 5</li>
+    <li>Coaching Week 5 (update contact)</li>
+    <li>Wait: Week 6</li>
+    <li>Coaching Week 6 (update contact)</li>
+    <li>Wait: Week 7</li>
+    <li>Coaching Week 7 (update contact)</li>
+    <li>Wait: Week 8</li>
+    <li>Coaching Week 8 (update contact)</li>
+    <li>Client Feedback Survey (60 Days) &mdash; email to client</li>
+    <li>[Weeks 9&ndash;11 &mdash; wait + update steps, not captured in screenshots]</li>
+    <li>Wait: Week 12</li>
+    <li>Coaching Week 12 (update contact)</li>
+    <li>Client Feedback Survey (90 Days) &mdash; email to client &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Enrolled from: <em>5. Coaching - Point Of Sale</em></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <div class="email-block">
+      <div class="email-meta">Internal Notification &middot; Week 2 - Internal Notification &middot; Step 5</div>
+      <div class="email-subject">Subject: Week 2&#xFE0F;&#x20E3; - {{contact.name}}</div>
+      <pre class="email-body">Hi {{user.first_name}},
+
+{{contact.name}} has just started Week {{contact.coaching_week_}} of the {{contact.sale_offer_sold}}!
+
+&#x1F389; This is a great opportunity to provide guidance and ensure they feel supported as they embark on their journey.
+
+Suggested Actions:
+
+Send a welcome message: Reinforce their excitement and commitment to the program.
+
+Schedule a quick check-in: Offer a 15-minute touchpoint to answer questions or clarify expectations for the program.
+
+Share Week {{contact.coaching_week_}} tips: Provide insights or resources to help them succeed during this critical second week.
+
+Key Details:
+
+Customer Name: {{contact.name}}
+Program Name: {{contact.sale_offer_sold}}
+Start Date: {{contact.sale_close_date}}
+Week: {{contact.coaching_week_}}
+Category: {{contact.coaching_category}}
+Lesson: {{contact.coaching_lesson}}
+
+Key Goal for Week {{contact.coaching_week_}}: [Brief description of what they&apos;re expected to do in Week {{contact.coaching_week_}}, e.g., &quot;Understanding program roadmap and setting initial goals&quot;]</pre>
+    </div>
+    <div class="email-block">
+      <div class="email-meta">Internal Notification &middot; Week 3 - Internal Notification &middot; Step 8</div>
+      <div class="email-subject">Subject: Week 3&#xFE0F;&#x20E3; - {{contact.name}}</div>
+      <pre class="email-body">Hi {{user.first_name}},
+
+{{contact.name}} has just started Week {{contact.coaching_week_}} of the {{contact.sale_offer_sold}}!
+
+&#x1F389; This is a great opportunity to provide guidance and ensure they feel supported as they embark on their journey.
+
+Suggested Actions:
+
+Review their progress: Look at their milestones or deliverables from previous weeks.
+
+Offer personalized support: Share advice or resources to help them navigate Week {{contact.coaching_week_}}&apos;s focus.
+
+Gather feedback: Ask how they&apos;re finding the program so far and if they need any adjustments or additional help.
+
+Key Details:
+
+Customer Name: {{contact.name}}
+Program Name: {{contact.sale_offer_sold}}
+Start Date: {{contact.sale_close_date}}
+Week: {{contact.coaching_week_}}
+Category: {{contact.coaching_category}}
+Lesson: {{contact.coaching_lesson}}
+
+Key Goal for Week {{contact.coaching_week_}}: [Brief description of what they&apos;re expected to do in Week {{contact.coaching_week_}}, e.g., &quot;Understanding program roadmap and setting initial goals&quot;]</pre>
+    </div>
+    <div class="email-block">
+      <div class="email-meta">Email &middot; Client Feedback Survey (30 Days) &middot; Step 11</div>
+      <div class="email-subject">Subject: Got 3 minutes to help us serve you better?</div>
+      <pre class="email-body">Hi {{contact.first_name}},
+
+First, thank you for trusting us over these first 30 days.
+
+We&apos;d love to know:
+
+What&apos;s working well for you
+How to best support you moving forward
+Where we might need to make some adjustments
+
+Please take 3 minutes to complete our quick survey:
+
+[SURVEY LINK]
+
+We review every response and make adjustments based on what we hear.
+
+Thanks for being awesome to work with.
+
+{{location_owner.first_name}} and the {{location.name}} team.</pre>
+    </div>
+    <div class="email-block">
+      <div class="email-meta">Email &middot; Client Feedback Survey (60 Days) &middot; Step 20</div>
+      <div class="email-subject">Subject: Got 3 minutes to help us serve you better?</div>
+      <pre class="email-body">Hi {{contact.first_name}},
+
+It&apos;s been 2 months since we started working together and we&apos;d love to know:
+
+What&apos;s working well for you
+How to best support you moving forward
+Where we might need to make some adjustments
+
+Please take 3 minutes to complete our quick survey:
+
+[SURVEY LINK]
+
+We review every response and make adjustments based on what we hear.
+
+Thanks for being awesome to work with.
+
+{{location_owner.first_name}} and the {{location.name}} team.</pre>
+    </div>
+    <div class="email-block">
+      <div class="email-meta">Email &middot; Client Feedback Survey (90 Days) &middot; Step 24</div>
+      <div class="email-subject">Subject: Got 3 minutes to help us serve you better?</div>
+      <pre class="email-body">Hi {{contact.first_name}},
+
+Congratulations on reaching the 90-day milestone with us!
+
+It&apos;s been a pleasure working with you.
+
+We&apos;d love to know:
+
+What&apos;s working well for you
+How to best support you moving forward
+Where we might need to make some adjustments
+
+Please take 3 minutes to complete our quick survey:
+
+[SURVEY LINK]
+
+We review every response and make adjustments based on what we hear.
+
+Thanks for being awesome to work with.
+
+{{location_owner.first_name}} and the {{location.name}} team.</pre>
+    </div>
+  </span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">13</span><span class="wf-name">UP Breakthrough Call Booking</span><span class="wf-folder">UP Breakthrough Call Booking</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/70a7c8cf-dac6-4eeb-ad08-5901fb12a8d7" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Customer Booked Appointment &middot; Trigger name: &ldquo;Customer Booked Appointment&rdquo; &middot; Enrollment: Contact only &middot; Filter: In calendar = &ldquo;Undeniable Presence Breakthrough Call&rdquo;
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag (action name: &ldquo;Add Tag&rdquo;) &middot; Tag: <code>undeniable-presence-bt-call-booked</code></li>
+    <li>Email &mdash; &ldquo;&#x26A0;&#xFE0F; [IMPORTANT] {{contact.first_name}}&rsquo;s {{appointment.title}}&rdquo; &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Booking confirmation for the Undeniable Presence Breakthrough Call calendar. Tags contact as <code>undeniable-presence-bt-call-booked</code> and immediately sends appointment confirmation email with call details, reschedule link, and cancel link.</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <strong>Confirmation Email &mdash; &ldquo;&#x26A0;&#xFE0F; [IMPORTANT] {{contact.first_name}}&rsquo;s {{appointment.title}}&rdquo;</strong><br>
+    Calendar confirmed &middot; When: <code>{{appointment.start_time}} {{appointment.timezone}}</code> &middot; Where: <code>{{appointment.meeting_location}}</code> &middot; Add to calendar link &middot; Reschedule link &middot; Cancel link &middot; Sign-off: <code>{{location_owner.first_name}}</code>
+  </span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">14</span><span class="wf-name">UP Client Enrollment</span><span class="wf-folder">UP Client Enrollment</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/c48ee2d2-60d7-4938-a3b2-a5d6f6e573f6" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Inbound Webhook &middot; Trigger name: &ldquo;Inbound Webhook&rdquo; &middot; No filters &middot; URL: <code>https://services.leadconnectorhq.com/hooks/h83O4TKy09yLLdfnIw3K/&hellip;</code> (premium trigger)
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Create Contact (action name: &ldquo;Create Contact&rdquo;) &middot; Fields mapped from webhook payload:
+      <ul>
+        <li>Email = <code>{{inboundWebhookRequest.Email}}</code></li>
+        <li>First name = <code>{{inboundWebhookRequest.Firstname}}</code></li>
+        <li>Last name = <code>{{inboundWebhookRequest.Lastname}}</code></li>
+      </ul>
+    </li>
+    <li>Add Tag (action name: &ldquo;undeniable-presence-active&rdquo;) &middot; Tag: <code>undeniable-presence-active</code></li>
+    <li>Wait &middot; 365 days &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Enrolls new Undeniable Presence (UP) clients via inbound webhook (likely triggered by payment processor or external signup). Creates/updates GHL contact with name + email from payload, tags as <code>undeniable-presence-active</code>, then waits 365 days &mdash; likely for membership anniversary or expiry tracking. Companion to #13 UP Breakthrough Call Booking.</span></div>
+</div></details><p class="note" style="margin-top:16px">Click any row to expand. Green dot = details captured. Send screenshot + email copy to add details.</p></div></body></html>

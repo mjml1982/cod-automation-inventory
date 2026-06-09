@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Receipts / Transactional - COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+
+details.wf-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+details.wf-card summary { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; font-size: .85rem; }
+details.wf-card summary::-webkit-details-marker { display: none; }
+details.wf-card summary:hover { background: #1c2128; }
+details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #30363d; }
+.wf-header-row { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; padding: 6px 14px; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: #8b949e; font-weight: 600; margin-bottom: 4px; }
+.wf-num { color: #6e7681; font-size: .8rem; }
+.wf-name { font-weight: 600; color: #e6edf3; }
+.wf-folder, .wf-subfolder { color: #8b949e; font-size: .82rem; }
+.wf-url { font-size: .78rem; }
+.wf-url a { color: #58a6ff; }
+.detail-dot { color: #3fb950; font-size: .6rem; vertical-align: middle; }
+.wf-detail { padding: 14px 18px; }
+.detail-pending { color: #6e7681; font-size: .83rem; font-style: italic; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: .85rem; }
+.detail-label { min-width: 110px; color: #8b949e; font-weight: 600; font-size: .78rem; text-transform: uppercase; padding-top: 2px; }
+.detail-val { color: #cdd9e5; flex: 1; }
+.email-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.email-meta { font-size: .75rem; color: #8b949e; margin-bottom: 4px; }
+.email-subject { font-weight: 600; color: #f0f6fc; margin-bottom: 8px; }
+.email-body { white-space: pre-wrap; font-size: .82rem; color: #cdd9e5; font-family: Arial, sans-serif; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.email-link { font-size: .78rem; color: #8b949e; margin-top: 6px; }
+.wf-screenshot { max-width: 100%; border-radius: 4px; border: 1px solid #30363d; margin-top: 6px; }
+</style></head><body><div class="container">
+<header><h1>COD Automation Inventory</h1><p>Prepared for Rehan &amp; Kas &mdash; 2026-06-05</p></header>
+<nav><a href="index.html">&larr; Back to Index</a></nav>
+<div class="section-header"><h2>Receipts / Transactional</h2></div>
+<p style="color:#8b949e;font-size:.88rem;margin-bottom:16px">Payment confirmations, refunds, opportunity tracking, and transactional system emails.</p>
+<div class="summary-bar"><strong>6</strong> total &nbsp;&middot;&nbsp; <strong style="color:#3fb950">6</strong> live &nbsp;&middot;&nbsp; <strong style="color:#d29922">0</strong> draft/inactive &nbsp;&middot;&nbsp; <strong style="color:#58a6ff">0</strong> details captured</div>
+<div class="wf-header-row"><span class="wf-num">#</span><span class="wf-name">Workflow Name</span><span class="wf-folder">Folder</span><span class="wf-subfolder">Subfolder</span><span>Status</span><span>GHL URL</span></div><details class="wf-card"><summary><span class="wf-num">1</span><span class="wf-name">Opportunity - Created</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder">Operations &gt; Reporting &gt; Sales</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/144b4316-8485-4110-a69f-c7e7b5b9163a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Opportunity Created &middot; Trigger name: &ldquo;Opportunity Created&rdquo; &middot; No filters applied</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Process Qualifiers (Custom Code JS &middot; Inputs: <code>qualifierFinancial</code>={{contact.what_kind_of_funds_cash_credit_etc_do_y&hellip;}} (funds field), <code>qualifierExpert</code>={{contact.application_audience}} &middot; Code: converts inputs to booleans &middot; Output: <code>expert</code> (bool), <code>financial</code> (bool))</li>
+    <li>#1 Update Opportunities Table (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; My Drive &middot; Reporting &rarr; Opportunities &middot; Columns Opportunity ID (A) &ndash; Lost Reason (M) &middot; A=<code>{{opportunity.id}}</code> &middot; B=<code>{{contact.name}}</code> &middot; C=<code>{{contact.email}}</code> &middot; D=<code>&quot;={{contact.phone}}&quot;</code> &middot; E (Status)=<code>{{opportunity.status}}</code> &middot; F (Team Member)=<code>{{opportunity.assignedTo}}</code> &middot; G (Call Booked)=empty &middot; H (Created At)=<code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code> &middot; I (Updated At)=<code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code> &middot; J (GHL Contact)=GHL contact URL &middot; K (Qualified - Expert)=<code>{{custom_code.1.output.expert}}</code> &middot; L (Qualified - Financially)=<code>{{custom_code.1.output.financial}}</code> &middot; M (Lost Reason)=<code>{{opportunity.lost_reason}}</code>)</li>
+    <li>#2 Log Update (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; Reporting &rarr; Log &middot; Columns A&ndash;D &middot; Contact/Booking/Sales ID (A)=<code>{{opportunity.id}}</code> &middot; Date &amp; Time (B)=<code>{{right_now.middle_endian_date}} {{right_now.time}}</code> &middot; Action (C)=&ldquo;New Opportunity&rdquo; &middot; Notes (D)=&ldquo;New opportunity for contact: {{contact.name}} ({{contact.id}})&rdquo;) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">2</span><span class="wf-name">Opportunity - Status Update</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder">Operations &gt; Reporting &gt; Sales</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/859137df-72e9-42c7-98f0-e0f9b480e10c" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <ol>
+      <li>Opportunity Status Changed &middot; Trigger name: &ldquo;WON&rdquo; &middot; Moved to status = Won</li>
+      <li>Opportunity Status Changed &middot; Trigger name: &ldquo;ABANDONED&rdquo; &middot; Moved to status = Abandoned</li>
+      <li>Opportunity Status Changed &middot; Trigger name: &ldquo;OPEN&rdquo; &middot; Moved to status = Open</li>
+      <li>Opportunity Status Changed &middot; Trigger name: &ldquo;LOST&rdquo; &middot; Moved to status = Lost</li>
+    </ol>
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#3 Lookup Spreadsheet Row (Google Sheets &middot; robot@russruffino.com &middot; Lookup spreadsheet row &middot; My Drive &middot; Reporting &rarr; Opportunities &middot; Lookup: Opportunity ID (A) = <code>{{opportunity.id}}</code> &middot; <strong>From bottom of sheet</strong>)</li>
+    <li>#4 Update Spreadsheet Row using Lookup (uses #3 &middot; Reporting &rarr; Opportunities &middot; Columns Name (B) &ndash; Lost Reason (M) &middot; B=<code>{{contact.name}}</code> &middot; C=<code>{{contact.email}}</code> &middot; D=<code>&quot;={{contact.phone}}&quot;</code> &middot; E (Status)=<code>{{opportunity.status}}</code> &middot; F (Team Member)=<code>{{opportunity.assignedTo}}</code> &middot; G (Call Booked)=empty &middot; H (Created At)=empty &middot; I (Updated At)=<code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code> &middot; J (GHL Contact)=GHL contact URL &middot; K (Qualified - Expert)=<code>{{custom_code.1.output.expert}}</code> &middot; L (Qualified - Financially)=<code>{{custom_code.1.output.financial}}</code> &middot; M (Lost Reason)=<code>{{opportunity.lost_reason}}</code>)</li>
+    <li>#2 Log Update (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; Reporting &rarr; Log &middot; Columns A&ndash;D &middot; Contact/Booking/Sales ID (A)=<code>{{opportunity.id}}</code> &middot; Date &amp; Time (B)=<code>{{right_now.middle_endian_date}} {{right_now.time}}</code> &middot; Action (C)=<code>&ldquo;Opportunity Status Update ({{opportunity.status}})&rdquo;</code> &middot; Notes (D)=&ldquo;Opportunity status update for contact: {{contact.name}} ({{contact.id}})&rdquo;) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">3</span><span class="wf-name">Payment Received</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder">Operations &gt; Reporting &gt; Sales</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/ced32503-dd8c-4eda-b709-8423fd49c37a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Payment Received &middot; Trigger name: &ldquo;Payment Received&rdquo; &middot; Payment status Is = Success</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Update Payments Table (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; My Drive &middot; Reporting &rarr; Payments (GHL) &middot; Columns Transaction ID (A) &ndash; GHL Contact (K) &middot; A (Transaction ID)=<code>{{payment.transaction_id}}</code> &middot; B (Date)=<code>{{right_now.middle_endian_date}}</code> &middot; C (Name)=<code>{{payment.customer.name}}</code> &middot; D (Email)=<code>{{payment.customer.email}}</code> &middot; E (Phone)=<code>{{payment.customer.phone}}</code> &middot; F (Status)=&ldquo;paid&rdquo; &middot; G (Payment)=<code>{{payment.currency_symbol}}{{payment.total_amount}}</code> &middot; H (Method)=<code>{{payment.method}}</code> &middot; I (Source)=<code>{{payment.source}}</code> &middot; J (Product)=<code>{{pluck payment.line_items &quot;title&quot;}}</code> &middot; K (GHL Contact)=GHL contact URL)</li>
+    <li>#2 Log Update (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; Reporting &rarr; Log &middot; Columns A&ndash;D &middot; Contact/Booking/Sales ID (A)=<code>{{payment.transaction_id}}</code> &middot; Date &amp; Time (B)=<code>{{right_now.middle_endian_date}} {{right_now.time}}</code> &middot; Action (C)=&ldquo;New Payment&rdquo; &middot; Notes (D)=&ldquo;New payment by contact: {{contact.name}} ({{contact.id}}) <span class="detail-pending">[truncated &mdash; payment detail not fully visible]</span>&rdquo;) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">4</span><span class="wf-name">Payment Refunded</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder">Operations &gt; Reporting &gt; Sales</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/12601133-a957-4b00-a5fa-26d3195009d1" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Refund &middot; Trigger name: &ldquo;Refund&rdquo; &middot; No filters applied</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#3 Lookup Spreadsheet Row (Google Sheets &middot; robot@russruffino.com &middot; Lookup spreadsheet row &middot; My Drive &middot; Reporting &rarr; Payments (GHL) &middot; Lookup: Transaction ID (A) = <code>{{refund.transaction_id}}</code> &middot; From top of sheet)</li>
+    <li>#4 Update Spreadsheet Row using Lookup (uses #3 &middot; Reporting &rarr; Payments (GHL) &middot; Update Status (E) = &ldquo;refund&rdquo;)</li>
+    <li>#2 Log Update (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; Reporting &rarr; Log &middot; Columns A&ndash;D &middot; Contact/Booking/Sales ID (A)=<code>{{payment.transaction_id}}</code> &middot; Date &amp; Time (B)=<code>{{right_now.middle_endian_date}} {{right_now.time}}</code> &middot; Action (C)=&ldquo;New Refund&rdquo; &middot; Notes (D)=&ldquo;New refund by contact: {{contact.name}} ({{contact.id}}) <span class="detail-pending">[truncated &mdash; payment detail not fully visible]</span>&rdquo;) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">5</span><span class="wf-name">Sale - New</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder">Operations &gt; Reporting &gt; Sales</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/f3b7becf-51dd-45c3-a19f-455af6421862" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Order Submitted &middot; Trigger name: &ldquo;Order Submitted&rdquo; &middot; No filters applied</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Update Sales Table (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; My Drive &middot; Reporting &rarr; Sales (GHL) &middot; Columns Contact ID (A) &ndash; GHL Contact (L) &middot; A (Contact ID)=<code>{{order.customer.id}}</code> &middot; B (Name)=<code>{{contact.name}}</code> &middot; C (Email)=<code>{{contact.email}}</code> &middot; D (Phone)=<code>&quot;={{contact.phone}}&quot;</code> &middot; E (Product)=<code>{{order.source}}</code> &middot; F (Sale Price)=<code>{{order.currency_symbol}}{{order.total_price}}</code> &middot; G (Cast Collected)=&ldquo;NA&rdquo; &middot; H (Contracted Balance)=&ldquo;NA&rdquo; &middot; I (Type)=<code>{{order.payment_gateway}}</code> &middot; J (Order Date)=<code>{{right_now.middle_endian_date}}</code> &middot; K (Order Time)=<code>{{right_now.time}}</code> &middot; L (GHL Contact)=GHL contact URL)</li>
+    <li>#2 Log Update (Google Sheets &middot; robot@russruffino.com &middot; Create spreadsheet row &middot; Reporting &rarr; Log &middot; Columns A&ndash;D &middot; Contact/Booking/Sales ID (A)=<code>{{contact.id}}</code> &middot; Date &amp; Time (B)=<code>{{right_now.middle_endian_date}} {{right_now.time}}</code> &middot; Action (C)=&ldquo;New Order&rdquo; &middot; Notes (D)=&ldquo;New order by contact: {{contact.name}} ({{contact.id}}) <span class="detail-pending">[truncated &mdash; order detail not fully visible]</span>&rdquo;) &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">6</span><span class="wf-name">COD Payment Processing</span><span class="wf-folder">COD Payment Processing</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/deb87176-382c-404b-8725-13b18de55e0f" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Payment Received &middot; Trigger name: &ldquo;COD -Split Pay&rdquo; &middot; Filters: Global Product Is <code>Clients On Demand - Two Monthly Payments</code> AND Payment Status Is <code>Success</code><br>
+    <strong>Trigger 2:</strong> Payment Received &middot; Trigger name: &ldquo;COD - PIF&rdquo; &middot; Filters: Global Product Is <code>Clients On Demand - Paid in Full</code> AND Payment Status Is <code>Success</code>
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Condition &rarr; 3 branches:
+      <ul>
+        <li><strong>Paid in Full branch</strong> (12 contacts) &mdash; Product Is <code>Clients On Demand - Paid in Full</code> &rarr;
+          <ol>
+            <li>Custom Code &mdash; Premium action (action name: &ldquo;Paid in Full &amp; Format Currency&rdquo;) &middot; Language: Javascript &middot; Property: <code>amount</code> = <code>{{payment.total_amount}}</code> &middot; Code: <pre>const payment = inputData.amount
+const paymentFormatted = payment.toLocaleString();
+output = { payment: paymentFormatted }</pre></li>
+            <li>Update contact field (action name: &ldquo;Update contact field&rdquo;) &middot; Action type: Update field data &middot; Field: <code>COD Contract Price</code> = <code>{{payment.currency_symbol}}{{custom_code.2.output.payment}}</code> &rarr; END</li>
+          </ol>
+        </li>
+        <li><strong>Split Pay branch</strong> (9 contacts) &mdash; Product Is <code>Clients On Demand - Two Monthly Payments</code> &rarr;
+          <ol>
+            <li>Custom Code &mdash; Premium action (action name: &ldquo;Split Pay &amp; Format Currency&rdquo;) &middot; Language: Javascript &middot; Property: <code>amount</code> = <code>{{payment.total_amount}}</code> &middot; Code: <pre>const payment = inputData.amount
+const paymentFormatted = payment.toLocaleString();
+const total = payment*2;
+const totalFormatted = total.toLocaleString();
+output = { total: totalFormatted, payment: paymentFormatted }</pre></li>
+            <li>Update contact field (action name: &ldquo;Update contact field&rdquo;) &middot; Action type: Update field data &middot; Field: <code>COD Contract Price</code> = <code>{{payment.currency_symbol}}{{custom_code.1.output.total}}</code> (full contract value = instalment &times; 2) &rarr; END</li>
+          </ol>
+        </li>
+        <li><strong>None branch</strong> (4 contacts) &mdash; When none of the conditions are met &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Fires on successful COD payments — two triggers cover both payment plans (PIF = Paid in Full one-time, Split Pay = Two Monthly Payments). Routes to the matching branch to format the payment amount and update a contact field. None branch handles edge cases.</span></div>
+</div></details><p class="note" style="margin-top:16px">Click any row to expand. Green dot = details captured. Send screenshot + email copy to add details.</p></div></body></html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>VIP Upgrade - COD Automation Inventory</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; }
+a { color: #58a6ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 28px; }
+header h1 { font-size: 1.6rem; color: #f0f6fc; }
+header p { color: #8b949e; margin-top: 4px; font-size: 0.9rem; }
+.gap-box { background: #1c2128; border: 1px solid #f85149; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; }
+.gap-box h2 { color: #f85149; font-size: 1rem; margin-bottom: 10px; }
+.gap-box ul { padding-left: 20px; color: #cdd9e5; font-size: 0.88rem; }
+.gap-box ul li { margin-bottom: 4px; }
+.honest-summary { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; font-size: .88rem; color: #8b949e; }
+.journey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.journey-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+.journey-card h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 6px; }
+.journey-card .count { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; }
+.journey-card p { font-size: 0.83rem; color: #8b949e; margin-bottom: 12px; }
+.journey-card a.btn { display: inline-block; padding: 6px 14px; background: #238636; color: #fff; border-radius: 6px; font-size: 0.83rem; }
+.journey-card a.btn:hover { background: #2ea043; text-decoration: none; }
+.proposed-box { background: #161b22; border: 1px solid #9e6a03; border-radius: 8px; padding: 18px 20px; margin-top: 28px; }
+.proposed-box h2 { color: #d29922; margin-bottom: 8px; }
+.proposed-box p { color: #8b949e; font-size: 0.88rem; }
+.section-header { margin: 28px 0 16px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+.section-header h2 { font-size: 1.1rem; color: #f0f6fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+table th { background: #1c2128; color: #8b949e; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #30363d; }
+table td { padding: 8px 12px; border-bottom: 1px solid #21262d; vertical-align: top; }
+table tr:hover td { background: #1c2128; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+.badge.live { background: #1a3a1a; color: #3fb950; border: 1px solid #238636; }
+.badge.draft { background: #2a2418; color: #d29922; border: 1px solid #9e6a03; }
+.badge.inactive { background: #2a1a1a; color: #f85149; border: 1px solid #b91c1c; }
+.badge.archived { background: #1a1a2a; color: #8b949e; border: 1px solid #484f58; }
+.url-cell { font-size: 0.78rem; font-family: monospace; word-break: break-all; }
+.no-url { color: #6e7681; font-style: italic; font-size: 0.78rem; }
+nav { font-size: 0.85rem; margin-bottom: 20px; }
+.summary-bar { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.85rem; color: #8b949e; }
+.summary-bar strong { color: #e6edf3; }
+.note { margin-top: 20px; font-size: .8rem; color: #484f58; }
+
+details.wf-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+details.wf-card summary { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; align-items: center; padding: 10px 14px; cursor: pointer; list-style: none; font-size: .85rem; }
+details.wf-card summary::-webkit-details-marker { display: none; }
+details.wf-card summary:hover { background: #1c2128; }
+details[open].wf-card summary { background: #1c2128; border-bottom: 1px solid #30363d; }
+.wf-header-row { display: grid; grid-template-columns: 32px 1fr 160px 180px 90px 120px; gap: 8px; padding: 6px 14px; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; color: #8b949e; font-weight: 600; margin-bottom: 4px; }
+.wf-num { color: #6e7681; font-size: .8rem; }
+.wf-name { font-weight: 600; color: #e6edf3; }
+.wf-folder, .wf-subfolder { color: #8b949e; font-size: .82rem; }
+.wf-url { font-size: .78rem; }
+.wf-url a { color: #58a6ff; }
+.detail-dot { color: #3fb950; font-size: .6rem; vertical-align: middle; }
+.wf-detail { padding: 14px 18px; }
+.detail-pending { color: #6e7681; font-size: .83rem; font-style: italic; }
+.detail-row { display: flex; gap: 12px; margin-bottom: 10px; font-size: .85rem; }
+.detail-label { min-width: 110px; color: #8b949e; font-weight: 600; font-size: .78rem; text-transform: uppercase; padding-top: 2px; }
+.detail-val { color: #cdd9e5; flex: 1; }
+.email-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+.email-meta { font-size: .75rem; color: #8b949e; margin-bottom: 4px; }
+.email-subject { font-weight: 600; color: #f0f6fc; margin-bottom: 8px; }
+.email-body { white-space: pre-wrap; font-size: .82rem; color: #cdd9e5; font-family: Arial, sans-serif; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.email-link { font-size: .78rem; color: #8b949e; margin-top: 6px; }
+.wf-screenshot { max-width: 100%; border-radius: 4px; border: 1px solid #30363d; margin-top: 6px; }
+</style></head><body><div class="container">
+<header><h1>COD Automation Inventory</h1><p>Prepared for Rehan &amp; Kas &mdash; 2026-06-05</p></header>
+<nav><a href="index.html">&larr; Back to Index</a></nav>
+<div class="section-header"><h2>VIP Upgrade</h2></div>
+<p style="color:#8b949e;font-size:.88rem;margin-bottom:16px">VIP upsell journey, VIP workshop access, pre/post event reminders for VIP buyers, weekly VIP reset.</p>
+<div class="summary-bar"><strong>10</strong> total &nbsp;&middot;&nbsp; <strong style="color:#3fb950">8</strong> live &nbsp;&middot;&nbsp; <strong style="color:#d29922">2</strong> draft/inactive &nbsp;&middot;&nbsp; <strong style="color:#58a6ff">0</strong> details captured</div>
+<div class="wf-header-row"><span class="wf-num">#</span><span class="wf-name">Workflow Name</span><span class="wf-folder">Folder</span><span class="wf-subfolder">Subfolder</span><span>Status</span><span>GHL URL</span></div><details class="wf-card"><summary><span class="wf-num">1</span><span class="wf-name">Workshop VIP</span><span class="wf-folder">Unsubscribe - SMS</span><span class="wf-subfolder"><span class="no-url">—</span></span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/c56a654c-9a9b-456a-8604-0ff5e5c3e345" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Payment Received &middot; Trigger name: &ldquo;Payment Received&rdquo; &middot; Global Product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Payment Status is &ldquo;Success&rdquo;</span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Generate Value (Custom code &middot; JavaScript) &mdash; <code>output = {result: &apos;workshop-vip&apos;}</code></li>
+    <li>Condition: <strong>Attribution History</strong>
+      <ul>
+        <li><strong>Empty</strong> (Attribution History is empty) &rarr; Update contact field: Attribution History = <code>{{custom_code.1.output.result}}</code> &rarr; END</li>
+        <li><strong>Not Empty</strong> (none of conditions met) &rarr; Update contact field: Attribution History = <code>{{contact.attribution_history}}, {{custom_code.1.output.result}}</code> &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">None</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">2</span><span class="wf-name">✅ VIP Bump Order</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/696809c6-540e-409d-8713-238f2ea0a73f" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Order Submitted &middot; Trigger name: &ldquo;Order Submitted&rdquo; &middot; Global product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Order source is &ldquo;Form&rdquo; &middot; <em>(Live)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add Tag: &ldquo;VIP Order Bump&rdquo;</li>
+    <li>Add to Workflow &middot; Adds contact to: &ldquo;✅ VIP Workshop Purchase&rdquo; &middot; Pass input trigger parameters: OFF</li>
+    <li>Condition (If &ldquo;Product&rdquo; is &ldquo;Workshop - High Tick&hellip;&rdquo;) &rarr; branches:
+      <ul>
+        <li><strong>VIP Upgrade</strong> (product matches): &rarr; END</li>
+        <li><strong>None</strong>: &rarr; END</li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Triggered by order bump purchase of &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; via Form; tags contact as VIP Order Bump and enrols into &ldquo;✅ VIP Workshop Purchase&rdquo; workflow</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None &mdash; routing only; emails handled by &ldquo;✅ VIP Workshop Purchase&rdquo;</span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">3</span><span class="wf-name">✅ VIP Workshop - Pre &amp; Post Event Reminders - KAMG  (drafted)</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/39cad81c-9e11-4152-b4f4-04853fb36db3" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Payment Received &middot; Trigger name: &ldquo;Workshop VIP Payment Received&rdquo; &middot; Global product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Payment status is &ldquo;Success&rdquo; &middot; <em>(Draft &mdash; not published)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Set Event Start Time &middot; Type: Custom field &middot; Custom field: <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code></li>
+    <li>#2 Custom Code &middot; Inputs: <code>vipDatePretty</code> = <code>{{custom_values.cod_auto_workshop_vip_date_prett&hellip;}}</code>, <code>vipTimePretty</code> = <code>{{custom_values.cod_auto_workshop_vip_time_prett&hellip;}}</code> &middot; Code: <code>output = { result: { vipDate: inputData.vipDatePretty, vipTime: inputData.vipTimePretty } }</code></li>
+    <li>Wait &middot; 48 hr Before Event &rarr; Email</li>
+    <li>Wait &middot; 24 hours Before Event &rarr; Email &rarr; SMS</li>
+    <li>Wait &middot; 3 hour before event &rarr; Email</li>
+    <li>Wait &middot; 30 min Before Event &rarr; SMS</li>
+    <li>Wait &middot; 24hr After Event &rarr; Condition (Tags includes &ldquo;call-discovery-bo&hellip;&rdquo;):
+      <ul>
+        <li><strong>IF has breakthrough booking:</strong> &rarr; END</li>
+        <li><strong>None:</strong> Email &rarr; Wait 49hr After Event &rarr; Condition:
+          <ul>
+            <li><strong>IF has breakthrough booking:</strong> &rarr; END</li>
+            <li><strong>None:</strong> Email &rarr; Wait 96hr After Event &rarr; Condition:
+              <ul>
+                <li><strong>IF has breakthrough booking:</strong> &rarr; END</li>
+                <li><strong>None:</strong> Email &rarr; Wait 119hr After Event &rarr; Condition:
+                  <ul>
+                    <li><strong>IF has breakthrough booking:</strong> &rarr; END</li>
+                    <li><strong>None:</strong> Email &rarr; Wait 146hr After Event &rarr; Condition:
+                      <ul>
+                        <li><strong>IF has breakthrough booking:</strong> &rarr; END</li>
+                        <li><strong>None:</strong> Email &rarr; END</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Reads <code>cod_auto_workshop_vip_date_raw</code> for event timing; <code>#2 Custom Code</code> outputs <code>vipDate</code>/<code>vipTime</code> used throughout emails; post-event conditions check tag &ldquo;call-discovery-bo&hellip;&rdquo; at each level (24hr, 49hr, 96hr, 119hr, 146hr); CTA throughout: <code>www.clientsondemand.com/apply</code></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><strong>Pre-event:</strong><ol>
+    <li><strong>&ldquo;Friday is 48 hours out. Here&rsquo;s how to make the most of it&rdquo;</strong> (48hr pre) &mdash; 3 prep questions; session format overview; VIP details: <code>{{custom_code.2.output.result.vipDate}}</code> @ <code>{{custom_code.2.output.result.vipTime}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code>; Zoom: <code>{{custom_values.cod_auto_workshop_vip_link}}</code> pw: RUSSVIP</li>
+    <li><strong>&ldquo;Tomorrow, {{contact.first_name}}. One day out.&rdquo;</strong> (24hr pre) &mdash; same VIP details; references 3 prep questions from prior email<br><strong>SMS (24hr):</strong> tomorrow reminder with vipTime, timezone, Zoom link + password</li>
+    <li><strong>&ldquo;Today&rsquo;s the day, {{contact.first_name}}.&rdquo;</strong> (3hr pre) &mdash; minimal; vipTime + timezone + Zoom link + password</li>
+    <li><strong>SMS (30min):</strong> &ldquo;Going live in 30 min. Join now: {{custom_values.cod_auto_workshop_vip_link}} Password: RUSSVIP&rdquo;</li>
+  </ol>
+  <strong>Post-event:</strong><ol>
+    <li><strong>&ldquo;Great Q&amp;A yesterday, {{contact.first_name}}.&rdquo;</strong> (24hr post, no booking) &mdash; bridges Q&amp;A energy to strategy call; CTA: <code>www.clientsondemand.com/apply</code></li>
+    <li><strong>&ldquo;Had a chance to process everything yet, {{contact.first_name}}?&rdquo;</strong> (49hr post, no booking) &mdash; knowledge-to-action gap; strategy call closes it; CTA: <code>www.clientsondemand.com/apply</code></li>
+    <li><strong>&ldquo;The gap between knowing and doing (and how to close it)&rdquo;</strong> (96hr post, no booking) &mdash; framework vs. deployment distinction; CTA: <code>www.clientsondemand.com/apply</code></li>
+    <li><strong>&ldquo;This is the last email I&rsquo;ll send about this, {{contact.first_name}}&rdquo;</strong> (119hr post, no booking) &mdash; references Q&amp;A date <code>{{custom_code.2.output.result.vipDate}}</code>; clarity fades urgency; CTA: <code>www.clientsondemand.com/apply</code></li>
+    <li><strong>&ldquo;Still thinking about it?&rdquo;</strong> (146hr post, no booking) &mdash; soft reply-based scheduling; &ldquo;no form, no funnel, just a reply&rdquo;</li>
+  </ol></span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">4</span><span class="wf-name">✅ VIP Workshop - Pre Event Reminders</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/423d775d-9115-4d0c-a9e7-3c01cc7f539d" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val"><ol>
+    <li>Order Form Submission &middot; Trigger name: &ldquo;Order Form Submission&rdquo; &middot; In funnel/website = &ldquo;Russ Ruffino: $27 Workshop Funnel (HTO) - Auto (Today)&rdquo; &middot; Submission type = &ldquo;Bump&rdquo;</li>
+    <li>Payment Received &middot; Trigger name: &ldquo;Workshop VIP Payment Received&rdquo; &middot; Global product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Payment status is &ldquo;Success&rdquo;</li>
+  </ol><em>(Live)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Set Event Start Time &middot; Type: Custom field &middot; Custom field: <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code></li>
+    <li>#2 Custom Code &middot; Inputs: <code>vipDatePretty</code> = <code>{{custom_values.cod_auto_workshop_vip_date_prett&hellip;}}</code>, <code>vipTimePretty</code> = <code>{{custom_values.cod_auto_workshop_vip_time_prett&hellip;}}</code> &middot; Code: <code>output = { result: { vipDate: inputData.vipDatePretty, vipTime: inputData.vipTimePretty } }</code></li>
+    <li>Wait 10 min &rarr; Email</li>
+    <li>Wait 5hr Before Event &rarr; Email &rarr; SMS</li>
+    <li>Wait 1 hour before event &rarr; Email &ldquo;&#x23F0; We&rsquo;re going LIVE in 1 Hour &ndash; Your VIP Call with Russ&rdquo; &rarr; SMS</li>
+    <li>Wait 15min Before Event &rarr; Email &ldquo;&#x23F0; 15min - Your VIP Call with Russ&rdquo; &rarr; SMS &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Triggered by VIP order bump or VIP payment; reads <code>cod_auto_workshop_vip_date_raw</code> for event timing; <code>#2 Custom Code</code> outputs <code>vipDate</code>/<code>vipTime</code> used throughout; sends reminders at 10min post-purchase, 5hr, 1hr, 15min before event</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><ol>
+    <li><strong>&ldquo;&#x1F6A8;Your VIP Call Details&rdquo;</strong> (10min after purchase) &mdash; VIP Group Q&amp;A invite; Zoom link <code>{{custom_values.cod_auto_workshop_vip_link}}</code>, password RUSSVIP, date <code>{{custom_code.2.output.result.vipDate}}</code> @ <code>{{custom_code.2.output.result.vipTime}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code></li>
+    <li><strong>&ldquo;&#x1F6A8;Your VIP Call with Russ&rdquo;</strong> (5hr before) &mdash; same access info; same merge fields<br><strong>SMS (5hr):</strong> Reminder with vipDate @ vipTime + timezone + Zoom link + password</li>
+    <li><strong>&ldquo;&#x23F0; We&rsquo;re going LIVE in 1 Hour &ndash; Your VIP Call with Russ&rdquo;</strong> (1hr before) &mdash; same access info; &ldquo;TODAY&rdquo; prefix on date<br><strong>SMS (1hr):</strong> &ldquo;starts in 1 HOUR&rdquo; + vipTime + timezone + Zoom link + password; final questions CTA</li>
+    <li><strong>&ldquo;&#x23F0; 15min - Your VIP Call with Russ&rdquo;</strong> (15min before) &mdash; same access info; &ldquo;going LIVE in 15 minutes&rdquo;<br><strong>SMS (15min):</strong> &ldquo;starts at the top of the hour&rdquo; + vipTime + timezone + Zoom link + password; final questions CTA</li>
+  </ol></span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">5</span><span class="wf-name">✅ VIP Workshop Invite Only (MANUAL)</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/73236a83-9e17-4b95-a4f6-82bc038edf0a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val"><span class="detail-pending">[trigger not captured &mdash; &ldquo;Add new trigger&rdquo; placeholder visible; open workflow and send trigger screenshot]</span></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Book Appointment &middot; Calendar: &ldquo;HTO VIP Workshop Booking&rdquo; &middot; Start Date &amp; Time: <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code> &middot; Override Availability: ON</li>
+    <li>Update contact field: &ldquo;HTO Workshop VIP Session&rdquo; &middot; Action type: Update field data &middot; Field: HTO Workshop VIP Session &middot; Custom Date = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code></li>
+    <li>Add to Workflow: &ldquo;✅ VIP Workshop - Pre Event Reminders&rdquo; &middot; Pass input trigger parameters: OFF &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Manual-trigger workflow; books contact on &ldquo;HTO VIP Workshop Booking&rdquo; calendar using <code>cod_auto_workshop_vip_date_raw</code>; stamps &ldquo;HTO Workshop VIP Session&rdquo; field with same raw date; then hands off to &ldquo;✅ VIP Workshop - Pre Event Reminders&rdquo; for all reminder emails</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None &mdash; routing/booking only; all emails handled by &ldquo;✅ VIP Workshop - Pre Event Reminders&rdquo;</span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">6</span><span class="wf-name">✅ VIP Workshop Purchase</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/600eb95c-640b-4b8e-a31c-9579987f2241" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val"><ol>
+    <li>Payment Received &middot; Trigger name: &ldquo;Workshop VIP Payment Received&rdquo; &middot; Global product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Payment status is &ldquo;Success&rdquo;</li>
+    <li>Order Form Submission &middot; Trigger name: &ldquo;Order Form Submission&rdquo; &middot; In funnel/website = &ldquo;Russ Ruffino: $27 Workshop Funnel (HTO) - Auto (Today)&rdquo; &middot; Submission type = &ldquo;Bump&rdquo;</li>
+  </ol><em>(Live)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add to Workflow: &ldquo;✅ VIP Workshop - Pre Event Reminders&rdquo; &middot; Pass input trigger parameters: OFF</li>
+    <li>Wait 5 mins</li>
+    <li>Add Tag (Workshop VIP Month &amp; Year) <span class="detail-pending">[full tag name truncated in screenshot]</span></li>
+    <li>Add Tag: &ldquo;auto-workshop-vip&rdquo;</li>
+    <li>Update contact field: &ldquo;HTO Workshop VIP Session&rdquo; <span class="detail-pending">[field value not captured &mdash; panel not open for this step]</span></li>
+    <li>#1 Generate date alias for VIP Date &middot; Custom Code &middot; Input: <code>dateRaw</code> = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code> &middot; Code: <code>const str = inputData.dateRaw; output = { result: str.split(&quot; &quot;)[0] }</code></li>
+    <li>#1 Book Appointment &middot; Calendar: &ldquo;HTO VIP Workshop Booking&rdquo; &middot; Start Date &amp; Time: <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code> &middot; Override Availability: ON</li>
+    <li>#1 Lookup Spreadsheet Row &middot; Action: Lookup spreadsheet row &middot; Drive: My Drive &middot; Spreadsheet: &ldquo;$27 Workshops&rdquo; &middot; Worksheet: &ldquo;Workshop Bookings&rdquo; &middot; Search: From top of the sheet &middot; Lookup column: Email (B) = <code>{{contact.email}}</code> &middot; Extra column: Session ID (S) = <code>{{contact.booked_workshop_aevent_id}}</code> &middot; Case sensitive: OFF &middot; New row columns A&ndash;S:
+      <ul>
+        <li>Name (A): <code>{{contact.name}}</code></li>
+        <li>Email (B): <code>{{contact.email}}</code></li>
+        <li>Phone (C): <code>{{contact.phone}}</code></li>
+        <li>Type (D): <code>VIP</code></li>
+        <li>LA - UTM Source (E): <code>{{contact.lastAttributionSource.utmSource}}</code></li>
+        <li>LA - UTM Medium (F): <code>{{contact.lastAttributionSource.utmMedium}}</code></li>
+        <li>LA - UTM Content (G): <code>{{contact.lastAttributionSource.utmContent}}</code></li>
+        <li>LA - URL (H): <code>{{contact.lastAttributionSource.url}}</code></li>
+        <li>FA - UTM Source (I): <code>{{contact.attributionSource.utmSource}}</code></li>
+        <li>FA - UTM Medium (J): <code>{{contact.attributionSource.utmMedium}}</code></li>
+        <li>FA - UTM Content (K): <code>{{contact.attributionSource.utmContent}}</code></li>
+        <li>FA - URL (L): <code>{{contact.attributionSource.url}}</code></li>
+        <li>Funnel URL (M): <code>{{contact.attributionSource.url}}</code></li>
+        <li>Ad (N): <code>{{contact.lastAttributionSource.adGroupId}} - {{contact.lastAttributionSource&hellip;}}</code> <span class="detail-pending">[value truncated in screenshot]</span></li>
+        <li>Date (O): <code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code></li>
+        <li>Session (Workshop) (P): <code>{{contact.booked_workshop_date_and_time}}</code></li>
+        <li>Session (VIP) (Q): <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code></li>
+        <li>Attendee Type (R): <code>vip</code></li>
+        <li>Session ID (S): <code>{{contact.booked_workshop_aevent_id}}</code></li>
+      </ul>
+    </li>
+    <li>#2 Update Spreadsheet Row using Lookup &middot; Action: Update spreadsheet row using lookup &middot; References: #1 Lookup Spreadsheet Row &middot; Starting column: Type (D) &middot; Ending column: Session (VIP) (Q) &middot; Only filled fields: Type (D) = <code>VIP</code>; Session (VIP) (Q) = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code>; all other columns blank</li>
+    <li>Sync to Google Sheet via Zapier (VIP) &mdash; <strong>Disabled</strong> &middot; Webhook POST <code>https://hooks.zapier.com/hooks/catch/197847/u68bfsu/</code> &middot; Custom data: <code>name</code>, <code>email</code>, <code>phone</code>, <code>source</code> = <code>{{contact.source}}</code>, <code>utmSource</code> = <code>{{contact.lastAttributionSource.utmSource}}</code>, <code>utmMedium</code> = <code>{{contact.lastAttributionSource.utmMedium}}</code>, <code>campaign</code> = <code>{{contact.lastAttributionSource.campaign}}</code>, <code>utmContent</code> = <code>{{contact.lastAttributionSource.utmContent}}</code>, <code>adID</code> = <code>{{contact.lastAttributionSource.adId}}</code>, <code>session</code> = <code>{{contact.booked_workshop_date_and_time}}</code>, <code>type</code> = <code>paid</code> &middot; No custom headers</li>
+    <li>Email &ldquo;You&rsquo;re In! Your VIP Workshop Seat is Confirmed&rdquo;</li>
+    <li>SMS &rarr; VIP confirmation</li>
+    <li>Wait 48 hours</li>
+    <li>Email &ldquo;Your Workshop Replay&rdquo; &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Triggered by VIP payment or order bump; immediately enrols into &ldquo;✅ VIP Workshop - Pre Event Reminders&rdquo;; tags contact &ldquo;auto-workshop-vip&rdquo;; stamps &ldquo;HTO Workshop VIP Session&rdquo; field; Custom Code extracts date-only portion via <code>str.split(&quot; &quot;)[0]</code>; books on &ldquo;HTO VIP Workshop Booking&rdquo; calendar using <code>cod_auto_workshop_vip_date_raw</code>; writes full row to Google Sheets &ldquo;$27 Workshops / Workshop Bookings&rdquo; (GHL native) &amp; Zapier webhook (disabled); reads <code>cod_auto_workshop_vip_date_pretty</code>, <code>cod_auto_workshop_vip_time_pretty</code>, <code>cod_auto_workshop_timezone</code> for confirmation email; sends replay 48hrs after purchase</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><ol>
+    <li><strong>&ldquo;You&rsquo;re In! Your VIP Workshop Seat is Confirmed&rdquo;</strong> (immediate) &mdash; VIP Q&amp;A details: <code>{{custom_values.cod_auto_workshop_vip_date_pretty}}</code> @ <code>{{custom_values.cod_auto_workshop_vip_time_pretty}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code>; AI Template Library delivered post-workshop; support: support@russruffino.com<br>
+    <strong>SMS:</strong> &ldquo;You&rsquo;re in as a VIP for the AI Workshop! &#x1F389; Watch your email for access details.&rdquo;</li>
+    <li><strong>&ldquo;Your Workshop Replay&rdquo;</strong> (48hrs after purchase) &mdash; Replay: <code>https://www.clientsondemand.com/hto.replay</code> pw: <code>7%@l^Nxb</code>; Prompt Library: <code>https://items-obey-2ps.craft.me/s2HtZ1VyYS24Am</code> pw: <code>russisawesome</code> &rarr; END</li>
+  </ol></span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">7</span><span class="wf-name">✅ VIP Workshop Purchase - KAMG (drafted)</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/059387bc-e288-4dd1-a9b9-4b28dfd60ff1" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val"><ol>
+    <li>Order Form Submission &middot; Trigger name: &ldquo;Order Form Submission&rdquo; &middot; In funnel/website = &ldquo;Russ Ruffino: $27 Workshop Funnel (HTO) - Auto (Today)&rdquo; &middot; Submission type = &ldquo;Bump&rdquo; &middot; Page is = <span class="detail-pending">[not set in screenshot]</span></li>
+    <li>Payment Received &middot; Trigger name: &ldquo;Workshop VIP Payment Received&rdquo; &middot; Global product is &ldquo;Workshop - High Ticket Offer - VIP Upgrade&rdquo; &middot; Payment status is &ldquo;Success&rdquo;</li>
+  </ol><em>(Draft &mdash; not published)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Wait 5 mins</li>
+    <li>Add Tag (Workshop VIP Month &amp; Year) <span class="detail-pending">[full tag name truncated in screenshot]</span></li>
+    <li>Add Tag: &ldquo;auto-workshop-vip&rdquo;</li>
+    <li>Update contact field: &ldquo;HTO Workshop VIP Session&rdquo; &middot; Action type: Update field data &middot; Custom Date = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code></li>
+    <li>#1 Generate date alias for VIP Date &middot; Custom Code &middot; Input: <code>dateRaw</code> = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code> &middot; Code: <code>const str = inputData.dateRaw; output = { result: str.split(&quot; &quot;)[0] }</code></li>
+    <li>#1 Book Appointment &middot; Calendar: &ldquo;HTO VIP Workshop Booking&rdquo; &middot; Start Date &amp; Time: <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code> &middot; Override Availability: ON</li>
+    <li>#1 Lookup Spreadsheet Row &middot; Drive: My Drive &middot; Spreadsheet: &ldquo;$27 Workshops&rdquo; &middot; Worksheet: &ldquo;Workshop Bookings&rdquo; &middot; Search: From top of the sheet &middot; Lookup: Email (B) = <code>{{contact.email}}</code> &amp; Session ID (S) = <code>{{contact.booked_workshop_aevent_id}}</code> &middot; Case sensitive: OFF &middot; Create New Row if not found: ON &middot; New row A&ndash;S: Name=<code>{{contact.name}}</code>, Email=<code>{{contact.email}}</code>, Phone=<code>{{contact.phone}}</code>, Type=<code>VIP</code>, LA-UTM Source=<code>{{contact.lastAttributionSource.utmSource}}</code>, LA-UTM Medium=<code>{{contact.lastAttributionSource.utmMedium}}</code>, LA-UTM Content=<code>{{contact.lastAttributionSource.utmContent}}</code>, LA-URL=<code>{{contact.lastAttributionSource.url}}</code>, FA-UTM Source=<code>{{contact.attributionSource.utmSource}}</code>, FA-UTM Medium=<code>{{contact.attributionSource.utmMedium}}</code>, FA-UTM Content=<code>{{contact.attributionSource.utmContent}}</code>, FA-URL=<code>{{contact.attributionSource.url}}</code>, Funnel URL=<code>{{contact.attributionSource.url}}</code>, Ad=<code>{{contact.lastAttributionSource.adGroupId}} - {{contact.lastAttributionSource&hellip;}}</code>, Date=<code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code>, Session (Workshop)=<code>{{contact.booked_workshop_date_and_time}}</code>, Session (VIP)=<code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code>, Attendee Type=<code>vip</code>, Session ID=<code>{{contact.booked_workshop_aevent_id}}</code></li>
+    <li>#2 Update Spreadsheet Row using Lookup &middot; References: #1 Lookup Spreadsheet Row &middot; Starting column: Type (D) &middot; Ending column: Session (VIP) (Q) &middot; Only filled: Type (D) = <code>VIP</code>; Session (VIP) (Q) = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}</code>; all other columns blank</li>
+    <li>Sync to Google Sheet via Zapier (VIP) &mdash; <strong>Disabled</strong> &middot; Webhook POST <code>https://hooks.zapier.com/hooks/catch/197847/u68bfsu/</code> &middot; Custom data: name, email, phone, source, utmSource, utmMedium, campaign, utmContent, adID = <code>{{contact.lastAttributionSource.adId}}</code>, session = <code>{{contact.booked_workshop_date_and_time}}</code>, type = <code>paid</code></li>
+    <li>Email &ldquo;You&rsquo;re in. Here&rsquo;s what happens next, {{contact.first_name}}.&rdquo;</li>
+    <li>SMS &rarr; workshop + VIP Q&amp;A confirmation</li>
+    <li>Wait 27 hours</li>
+    <li>Email &ldquo;Your Workshop Replay&rdquo; &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">KAMG draft variant of &ldquo;✅ VIP Workshop Purchase&rdquo; (#6); same two triggers, same spreadsheet/booking/Zapier steps; key differences: no &ldquo;Add to Workflow: VIP Pre Event Reminders&rdquo; step; confirmation email covers both workshop (<code>{{contact.booked_workshop_pretty_date}}</code> + <code>{{contact.joinurl}}</code>) and Friday VIP Q&amp;A; wait before replay email is 27 hours (vs 48hrs in #6); reads <code>cod_auto_workshop_vip_date_pretty</code>, <code>cod_auto_workshop_vip_time_pretty</code>, <code>cod_auto_workshop_timezone</code>, <code>cod_auto_workshop_vip_link</code></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><ol>
+    <li><strong>&ldquo;You&rsquo;re in. Here&rsquo;s what happens next, {{contact.first_name}}.&rdquo;</strong> (immediate) &mdash; Two sessions confirmed:<br>
+    &bull; <strong>Workshop:</strong> <code>{{contact.booked_workshop_pretty_date}}</code> Pacific &middot; link: <code>{{contact.joinurl}}</code> &middot; 1hr + 15min reminders promised<br>
+    &bull; <strong>Friday VIP Q&amp;A with Russ:</strong> <code>{{custom_values.cod_auto_workshop_vip_date_pretty}}</code> @ <code>{{custom_values.cod_auto_workshop_vip_time_pretty}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code> &middot; Zoom: <code>{{custom_values.cod_auto_workshop_vip_link}}</code> pw: RUSSVIP &middot; &ldquo;one-time event&rdquo; urgency; team to personally reach out<br>
+    <strong>SMS:</strong> &ldquo;confirmed for workshop + Friday VIP Q&amp;A on <code>{{custom_values.cod_auto_workshop_vip_date_pretty}}</code> @ <code>{{custom_values.cod_auto_workshop_vip_time_pretty}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code>. Small group, real conversation. Check email for full details.&rdquo;</li>
+    <li><strong>&ldquo;Your Workshop Replay&rdquo;</strong> (27hrs after purchase) &mdash; Replay: <code>https://www.clientsondemand.com/hto.replay</code> pw: <code>7%@l^Nxb</code>; Prompt Library: <code>https://items-obey-2ps.craft.me/s2HtZ1VyYS24Am</code> pw: <code>russisawesome</code> &rarr; END</li>
+  </ol></span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">8</span><span class="wf-name">✅ Weekly Reset (VIP)</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaigns &gt; Auto - COD - HTO Workshop</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/865fe130-4dff-4390-9f53-aba58d9f5430" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Scheduler &middot; Trigger name: &ldquo;Scheduler&rdquo; &middot; Interval: Weekly &middot; On days: Wednesday &middot; At: 16:00 &middot; +1 more filter <span class="detail-pending">[additional filter not captured]</span> &middot; <em>(Live)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Generate Date + Time String &middot; Custom Code (Premium action) &middot; Inputs: <code>vipTime</code> = <code>{{custom_values.cod_auto_workshop_vip_time}}</code>, <code>vipDay</code> = <code>{{custom_values.cod_auto_workshop_vip_day}}</code> &middot; Calls <code>nextDateTimeWithGrace(inputData.vipDay, inputData.vipTime, 3)</code> with 3-day grace period &middot; Outputs: <code>result.formatted</code> (&ldquo;MM-DD-YYYY H:MM AM/PM&rdquo;), <code>result.datePretty</code> (&ldquo;Month Nth&rdquo;), <code>result.timePretty</code> (&ldquo;H:MM AM/PM&rdquo;)</li>
+    <li>Time Pretty &middot; Update Custom Value &middot; CV: <code>COD Auto Workshop VIP Time Pretty</code> &middot; New value: <code>{{custom_code.1.output.result.timePretty}}</code></li>
+    <li>Date Time Raw &middot; Update Custom Value &middot; CV: <code>COD Auto Workshop VIP Date Raw</code> &middot; New value: <code>{{custom_code.1.output.result.formatted}}</code></li>
+    <li>Date Pretty &middot; Update Custom Value &middot; CV: <code>COD Auto Workshop VIP Date Pretty</code> &middot; New value: <code>{{custom_code.1.output.result.datePretty}}</code> &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Runs weekly on Wednesday at 16:00; reads <code>cod_auto_workshop_vip_time</code> and <code>cod_auto_workshop_vip_day</code>; computes next VIP session date using <code>nextDateTimeWithGrace</code> (3-day grace &mdash; if event is &lt;3 days away, jumps one week forward); writes results to <code>cod_auto_workshop_vip_date_raw</code>, <code>cod_auto_workshop_vip_date_pretty</code>, <code>cod_auto_workshop_vip_time_pretty</code>; mirrors pattern of &ldquo;Auto - Weekly Reset (VIP Afterparty)&rdquo; in workshop.html but targets VIP session custom values</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">None &mdash; date-reset utility only</span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">9</span><span class="wf-name">[Live Workshop - BEO] - VIP Call - Reminders &amp; Recording</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaings &gt; LIVE Workshop - BEO</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/d14f41de-5144-47fd-bf28-58b732dbcc1b" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Contact Tag &middot; Trigger name: &ldquo;Contact Tag: live-beo-workshop&rdquo; &middot; Filter: Tag Added = <code>live-beo-workshop-vip</code> <em>(note: trigger name says &ldquo;live-beo-workshop&rdquo; but filter tag is <code>live-beo-workshop-vip</code>)</em>
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Set Event Start Time - 9AM June 12th &middot; Type: Specific date/time &middot; Date: <code>2026-06-12 9:00 AM</code></li>
+    <li>Wait: 24hr before event (24 hour reminder)</li>
+    <li>Email &mdash; &ldquo;🚨Your VIP Followup Call with Russ&rdquo;</li>
+    <li>SMS</li>
+    <li>Wait: 1 hour before event</li>
+    <li>Email &mdash; &ldquo;⏰ We&rsquo;re going LIVE in 1 Hour &ndash; Your VIP Followup Call with Russ&rdquo;</li>
+    <li>SMS</li>
+    <li>Wait: 15 min before event</li>
+    <li>Email &mdash; &ldquo;⏰ We&rsquo;re going LIVE in a few minutes &ndash; Your VIP Followup Call with Russ&rdquo;</li>
+    <li>SMS &rarr; END</li>
+    <li><span class="detail-pending">Note: &ldquo;Wait 365 days&rdquo; step visible in canvas (2 contacts) &mdash; exact position not captured; workflow name says &ldquo;Reminders &amp; Recording&rdquo; but no recording email step visible in screenshots &mdash; may be hidden after 365-day wait or in a separate workflow</span></li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">VIP call reminder sequence for BEO live workshop; fires on <code>live-beo-workshop-vip</code> tag; VIP event anchor: <code>2026-06-12 9:00 AM</code>; 3 reminder waves (24hr, 1hr, 15min) via email + SMS; uses <code>{{custom_values.beo_workshop_vip_zoom_link}}</code>, <code>{{custom_values.beo_workshop_vip_date}}</code>, <code>{{custom_values.beo_workshop_vip_time}}</code> &middot; Password: <code>RUSSVIP</code></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <strong>24hr Email &mdash; &ldquo;🚨Your VIP Followup Call with Russ&rdquo;</strong><br>
+    Hi {{contact.first_name}}, VIP Followup Call is coming up &mdash; <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET.<br>
+    🔗 Zoom: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; 🔒 Password: <code>RUSSVIP</code> &middot; 📅 <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET.<br>
+    Mark your calendar, clear your schedule, come ready with more questions. &mdash; Russ<br><br>
+    <strong>24hr SMS</strong><br>
+    Reminder: Your VIP Followup Call with Russ &mdash; <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET! Join: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; Password: <code>RUSSVIP</code><br><br>
+    <strong>1hr Email &mdash; &ldquo;⏰ We&rsquo;re going LIVE in 1 Hour &ndash; Your VIP Followup Call with Russ&rdquo;</strong><br>
+    Hi {{contact.first_name}}, just 1 hour away from going LIVE with your VIP Call!<br>
+    🔗 Zoom: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; 🔒 Password: <code>RUSSVIP</code> &middot; 📅 TODAY &mdash; <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET. &mdash; Russ<br><br>
+    <strong>1hr SMS</strong><br>
+    Reminder: Your VIP Followup Call with Russ starts in 1 HOUR &mdash; <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET! Join: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; Password: <code>RUSSVIP</code>. Let&rsquo;s get any final questions answered and your high-ticket offer done! &mdash; Russ<br><br>
+    <strong>15min Email &mdash; &ldquo;⏰ We&rsquo;re going LIVE in a few minutes &ndash; Your VIP Followup Call with Russ&rdquo;</strong><br>
+    Hi {{contact.first_name}}, just minutes away from going LIVE with your VIP Call!<br>
+    🔗 Zoom: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; 🔒 Password: <code>RUSSVIP</code> &middot; 📅 TODAY &mdash; <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET. &mdash; Russ<br><br>
+    <strong>15min SMS</strong><br>
+    Reminder: Your VIP Followup Call with Russ starts at the top of the HOUR &mdash; <code>{{custom_values.beo_workshop_vip_time}}</code> PT / 12pm ET! Join: <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; Password: <code>RUSSVIP</code>. Let&rsquo;s get any final questions answered and your high-ticket offer done! &mdash; Russ
+  </span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">10</span><span class="wf-name">[Live Workshop - BEO] - VIP Purchase Confirmation</span><span class="wf-folder">$27 Workshop Thanks Survey Submitted</span><span class="wf-subfolder">Campaings &gt; LIVE Workshop - BEO</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/ca5d98d4-18bd-4044-ab43-a97b89600ac4" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Payment Received &middot; Trigger name: &ldquo;Payment Received&rdquo; &middot; Filter: Global product is &ldquo;Live Workshop - $30k-100k Offer Creation (VIP)&rdquo; &middot; Payment status is &ldquo;Success&rdquo;
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>FB Conversion API</li>
+    <li>Add Tag: <code>live-beo-workshop-vip</code></li>
+    <li>Email &mdash; &ldquo;VIP CONFIRMED: Your Exclusive Access to the $30K-$100K Back-End Offer Workshop ⭐&rdquo;</li>
+    <li>SMS</li>
+    <li>#1 Lookup Spreadsheet Row &middot; Action: Lookup spreadsheet row &middot; Drive: My Drive &middot; Spreadsheet: &ldquo;$27 Workshops&rdquo; &middot; Worksheet: Workshop Bookings &middot; Search: From top of the sheet &middot; Lookup: Email(B) = <code>{{contact.email}}</code> &middot; Extra: Session ID(S) = <code>Live BEO</code> &middot; Create new row if not found (A&rarr;S):
+      <ul>
+        <li>Name(A)=<code>{{contact.name}}</code> &middot; Email(B)=<code>{{contact.email}}</code> &middot; Phone(C)=<code>{{contact.phone}}</code> &middot; Type(D)=<code>Normal</code></li>
+        <li>LA-UTM Source(E)=<code>{{contact.lastAttributionSource.utmSource}}</code> &middot; LA-UTM Medium(F)=<code>{{contact.lastAttributionSource.utmMedium}}</code> &middot; LA-UTM Content(G)=<code>{{contact.lastAttributionSource.utmContent}}</code> &middot; LA-URL(H)=<code>{{contact.lastAttributionSource.url}}</code></li>
+        <li>FA-UTM Source(I)=<code>{{contact.attributionSource.utmSource}}</code> &middot; FA-UTM Medium(J)=<code>{{contact.attributionSource.utmMedium}}</code> &middot; FA-UTM Content(K)=<code>{{contact.attributionSource.utmContent}}</code> &middot; FA-URL(L)=<code>{{contact.attributionSource.url}}</code></li>
+        <li>Funnel URL(M)=<code>{{contact.attributionSource.url}}</code> &middot; AD(N)=<code>{{contact.lastAttributionSource.adGroupId}} - {{contact.lastAttributionSource.adId}}</code></li>
+        <li>Date(O)=<code>{{right_now.middle_endian_date}} {{right_now.time_ampm}}</code> &middot; Session(Workshop)(P)=<code>06/04/2026 9:00</code> &middot; Session(VIP)(Q)=<em>(empty)</em> &middot; Attendee Type(R)=<code>paid</code> &middot; Session ID(S)=<code>Live BEO</code></li>
+      </ul>
+    </li>
+    <li>Wait 365 Days</li>
+    <li>Email <span class="detail-pending">[subject/content pending &mdash; likely recording access]</span> &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">VIP purchase confirmation for BEO live workshop; product: &ldquo;Live Workshop - $30k-100k Offer Creation (VIP)&rdquo;; fires FB Conversion API, adds <code>live-beo-workshop-vip</code> tag (triggers #9 VIP call reminder sequence), sends VIP confirmation email + SMS, logs to &ldquo;$27 Workshops&rdquo; / Workshop Bookings (A&rarr;S) with Session ID(S)=<code>Live BEO</code>; Wait 365 Days then sends a follow-up email</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <strong>VIP Confirmation Email &mdash; &ldquo;VIP CONFIRMED: Your Exclusive Access to the $30K-$100K Back-End Offer Workshop ⭐&rdquo;</strong><br>
+    Congrats {{contact.first_name}} on upgrading to VIP! Included in VIP package:<br>
+    ✅ EXCLUSIVE Bonus Offer-Review Call on <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> Pacific &mdash; personal review of offer, positioning &amp; structure after designing live on <code>{{custom_values.beo_workshop_date}}</code><br>
+    ✅ Priority Q&amp;A Access During Both Calls &mdash; front-of-the-line access<br>
+    ✅ Access to ALL Recordings &mdash; both main workshop + VIP review call<br>
+    📅 Main Workshop: <code>{{custom_values.beo_workshop_date}}</code> @ 4pm Pacific / 7pm Eastern &middot; 🔗 <code>{{custom_values.beo_workshop_zoom_link}}</code> &middot; 🔒 <code>RUSS2026</code><br>
+    📅 VIP Bonus Call: <code>{{custom_values.beo_workshop_vip_date}}</code> @ <code>{{custom_values.beo_workshop_vip_time}}</code> Pacific / 12pm Eastern &middot; 🔗 <code>{{custom_values.beo_workshop_vip_zoom_link}}</code> &middot; 🔒 <code>RUSSVIP</code><br>
+    Questions: support@russruffino.com. Welcome to VIP level! &mdash; Russ. P.S. Come to both calls ready to work!<br><br>
+    <strong>SMS</strong><br>
+    Hey {{contact.first_name}}, you&rsquo;re in as a VIP for the $30K+ Back-End Offer Workshop! 🎉 Watch your email for access details. Excited to have you!<br><br>
+    <strong>Post-365-Day Email</strong> <span class="detail-pending">[subject/content pending]</span>
+  </span></div>
+</div></details>
+<details class="wf-card"><summary><span class="wf-num">11</span><span class="wf-name">Auto - VIP Afterparty Invite</span><span class="wf-folder"><span class="no-url">&mdash;</span></span><span class="wf-subfolder"><span class="no-url">&mdash;</span></span><span class="badge">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/c0806d25-dd17-4264-9977-9440703153e8" target="_blank">Open in GHL &nearr;</a></span></summary>
+<div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">Contact Tag &middot; Trigger name: &ldquo;Contact Tag: auto-workshop-vip-afterparty&rdquo; &middot; Tag added includes &ldquo;auto-workshop-vip-afterparty&rdquo; &middot; <em>(Draft &mdash; not published)</em></span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>#1 Book Appointment &middot; Calendar: &ldquo;HTO VIP Afterparty&rdquo; &middot; Start Date &amp; Time: <code>{{custom_values.cod_auto_workshop_vip_afterparty_da&hellip;}}</code> &middot; Override Availability: ON</li>
+    <li>Email &middot; Subject: &ldquo;&#x1F6A8;Your VIP Afterparty Details&rdquo;</li>
+    <li>Update contact field: HTO Workshop VIP Afterparty Session &middot; Action type: Update field data &middot; Field: HTO Workshop VIP Afterparty Session &middot; Custom Date = <code>{{custom_values.cod_auto_workshop_vip_date_raw}}{{custom_values&hellip;}}</code> <span class="detail-pending">[value appears truncated/concatenated in screenshot]</span> &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Reads custom values: <code>cod_auto_workshop_vip_afterparty_da&hellip;</code> (date raw), <code>cod_auto_workshop_vip_afterparty_date_pretty</code>, <code>cod_auto_workshop_vip_afterparty_time_pretty</code>, <code>cod_auto_workshop_vip_afterparty_link</code>, <code>cod_auto_workshop_timezone</code>; books on &ldquo;HTO VIP Afterparty&rdquo; calendar</span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val"><strong>&ldquo;&#x1F6A8;Your VIP Afterparty Details&rdquo;</strong> &mdash; invitation to Russ&rsquo; VIP Afterparty Zoom call &middot; Zoom link: <code>{{custom_values.cod_auto_workshop_vip_afterparty_link}}</code> &middot; Password: RUSSVIP &middot; Date/Time: <code>{{custom_values.cod_auto_workshop_vip_afterparty_date_pretty}}</code> @ <code>{{custom_values.cod_auto_workshop_vip_afterparty_time_pretty}}</code> <code>{{custom_values.cod_auto_workshop_timezone}}</code></span></div>
+</div></details>
+<p class="note" style="margin-top:16px">Click any row to expand. Green dot = details captured. Send screenshot + email copy to add details.</p></div></body></html>
