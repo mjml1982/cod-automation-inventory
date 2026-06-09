@@ -368,7 +368,176 @@ If you have any questions or want to explore these resources further, please rep
 I'd be happy to point you in the right direction!
 
 Wishing you the best,
-Russ Ruffino</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">23</span><span class="wf-name">Application Survey - Qualified</span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/af985a97-5b79-41f3-909a-eaa16c9c533d" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-pending">Details not yet captured &mdash; open GHL link and send screenshot + email copy.</div></div></details><details class="wf-card"><summary><span class="wf-num">24</span><span class="wf-name">Application Survey - Started (Draft) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/5244b5f8-84ae-42af-a0ca-60e8a1408585" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Contact Created (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">When a contact is created, checks if the source contains 'application survey : Partial Creation'. If true, updates the opportunity status to Application Started. If false, ends immediately. Designed to track partial/incomplete application survey submissions as a pipeline stage.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Draft/inactive — not currently running. Intended to capture partial application completions and move the opportunity to 'Application Started' stage. The broad trigger (Contact Created, no filters) could enroll unrelated contacts if activated without adding filters.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-survey-started-overview.png" alt="Application Survey - Started (Draft) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">25</span><span class="wf-name">Application Survey - Submitted -&gt; Note <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/0ee2f38f-9697-45bc-acd7-fea08e5cb19a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Survey submitted (2 parallel triggers):
+Russ Ruffino</pre></div></span></div></div></details><details class="wf-card"><summary><span class="wf-num">23</span><span class="wf-name">Application Survey - Qualified</span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/af985a97-5b79-41f3-909a-eaa16c9c533d" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail">
+  <div class="detail-row"><span class="detail-label">Triggers</span><span class="detail-val">
+    <strong>Trigger 1:</strong> Survey Submitted &middot; Trigger name: &ldquo;Survey Submitted - Generic&rdquo; &middot; Filters: Survey is any of <code>Application Survey</code> &middot; Disqualified is false<br>
+    <strong>Trigger 2:</strong> Survey Submitted &middot; Trigger name: &ldquo;Survey Submitted (VSL)&rdquo; &middot; Filters: Survey is any of <code>Application Survey - VSL</code> &middot; Disqualified is false<br>
+    <strong>Trigger 3:</strong> Survey Submitted &middot; Trigger name: &ldquo;Survey Submitted (Masterclass)&rdquo; &middot; Filters: Survey is any of <code>Application Survey - Masterclass</code> &middot; Disqualified is false
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Enrollment</span><span class="detail-val">Contact only</span></div>
+  <div class="detail-row"><span class="detail-label">Steps</span><span class="detail-val"><ol>
+    <li>Add contact tag (action name: &ldquo;Add Application Qualified Tag&rdquo;) &middot; Tag: <code>application-qualified</code></li>
+    <li>Find Opportunity (action name: &ldquo;Find Opportunity&rdquo;) &middot; Opportunity to be found: Most recently created opportunity &middot; Fields: Opportunity Name Contains <code>{{contact.name}}</code>
+      <ul>
+        <li><strong>Opportunity Found:</strong>
+          <ol>
+            <li>Meta Conversion API <em>(Disabled)</em> (action name: &ldquo;FB Conversion API&rdquo;) &middot; Connection type: Integration &middot; Event type: Funnel Event &middot; Facebook Event Name: <code>SubmitApplication</code> &middot; Access token: <code>{{custom_values.fb_token_cod5}}</code> &middot; Dataset ID: <code>{{custom_values.fb_pixel_cod5}}</code> &middot; Value: (empty) &middot; Currency: USD &middot; Test code: (empty) &middot; Custom mapping: ON &middot; FBCLID: <code>{{contact.lastAttributionSource.fbclid}}</code></li>
+            <li>Update Opportunity (action name: &ldquo;Application Qualified&rdquo;) &middot; Allow move to previous stage: OFF &middot; Duplicate opportunity: Disabled &middot; Fields: Pipeline = &ldquo;1. Sales Pipeline&rdquo;, Pipeline Stage = &ldquo;Application Qualified&rdquo;</li>
+          </ol>
+        </li>
+        <li><strong>Opportunity Not Found:</strong>
+          <ol>
+            <li>Create Opportunity (action name: &ldquo;Application Qualified&rdquo;) &middot; Pipeline: &ldquo;1. Sales Pipeline&rdquo; &middot; Duplicate opportunity: Disabled &middot; Fields: Pipeline Stage = &ldquo;Application Qualified&rdquo;</li>
+            <li>Go To &rarr; <strong>Wait 17 Minutes</strong> (both branches converge here)</li>
+          </ol>
+        </li>
+      </ul>
+    </li>
+    <li>Wait 17 Minutes</li>
+    <li>Email &ldquo;Email #1&rdquo;</li>
+    <li>Wait 3 Hours</li>
+    <li>Email &ldquo;Email #2&rdquo;</li>
+    <li>Wait 23 Hours</li>
+    <li>Email &ldquo;Email #3&rdquo; &rarr; END</li>
+  </ol></span></div>
+  <div class="detail-row"><span class="detail-label">Emails</span><span class="detail-val">
+    <div class="email-block"><div class="email-meta">Email 1 &middot; After Wait 17 Minutes &middot; From: Russ Ruffino</div>
+    <div class="email-subject">Subject: You&rsquo;re in &mdash; book your call, {{contact.first_name}}!</div>
+    <pre class="email-body">Hi {{contact.first_name}},
+
+I wanted to reach out&mdash; we&rsquo;ve reviewed your application and it looks like you&rsquo;re a great fit.
+
+The next step is to book a breakthrough call with the team. This is where we dig into your specific situation and map out exactly how to start attracting high-ticket clients consistently.
+
+
+&#128073; Click here to book your call now
+
+
+
+Here&rsquo;s what happens on the call:
+
+
+
+&bull; We&rsquo;ll uncover what&rsquo;s actually blocking you from premium clients right now
+
+
+&bull; You&rsquo;ll get a clear, step-by-step game plan tailored to your business
+
+
+&bull; You&rsquo;ll leave knowing exactly what to do next  . . .  no confusion, no guesswork
+
+
+
+This isn&rsquo;t a sales pitch disguised as a call. It&rsquo;s a real strategy session. Whether you end up working with us or not, you&rsquo;ll walk away with clarity.
+
+
+
+If you looked at the calendar and didn&rsquo;t see a time that works, just reply to this email. We&rsquo;ll find something.
+
+
+
+Don&rsquo;t overthink this one, you applied because something needs to change. Let&rsquo;s figure out what that change looks like.
+
+To your success,
+
+Russ Ruffino
+
+
+
+P.S. The fastest-growing businesses I know all have one thing in common: they take action quickly. Your move.</pre></div>
+    <div class="email-block"><div class="email-meta">Email 2 &middot; After Wait 3 Hours &middot; From: Russ Ruffino</div>
+    <div class="email-subject">Subject: {{contact.first_name}} &mdash; one thing left to do</div>
+    <pre class="email-body">Hi {{contact.first_name}},
+
+
+You filled out the application, which tells me you&rsquo;re serious about building something bigger.
+
+
+
+But you haven&rsquo;t booked your call yet &mdash; and I don&rsquo;t want you to lose this window.
+
+
+
+Look, I know there are a million &ldquo;free calls&rdquo; out there that are really just hard sells in disguise. This isn&rsquo;t that. My team&rsquo;s job on this call is simple: figure out where you&rsquo;re stuck, and show you the path forward.
+
+
+
+You&rsquo;ll walk away with:
+
+
+
+&bull; The real reason high-ticket clients aren&rsquo;t flowing into your business yet
+
+
+
+&bull; A personalized action plan &mdash; not cookie-cutter advice you&rsquo;ve heard a hundred times
+
+
+
+&bull; Total clarity on whether Clients on Demand is even right for you
+
+
+
+&#128073; Secure your spot now by clicking here
+
+No time on the calendar that works? Just hit reply. We&rsquo;ll make it happen.
+
+
+
+Here&rsquo;s the truth: the difference between businesses that scale and businesses that stay stuck usually comes down to one decision they almost didn&rsquo;t make.
+
+
+
+This could be that decision.
+
+
+
+Let&rsquo;s talk,
+
+Russ Ruffino
+
+
+
+P.S. You&rsquo;ve already done the hard part &mdash; you raised your hand. Now let&rsquo;s finish what you started.</pre></div>
+    <div class="email-block"><div class="email-meta">Email 3 &middot; After Wait 23 Hours &middot; From: Russ Ruffino</div>
+    <div class="email-subject">Subject: {{contact.first_name}}, one call could change everything</div>
+    <pre class="email-body">Hi {{contact.first_name}},
+
+
+I&rsquo;ll keep this short.
+
+
+
+You filled out the application. You know you want help getting high-ticket clients. But you still haven&rsquo;t booked your call.
+
+I&rsquo;m not going to chase you &mdash; that&rsquo;s not how this works. But I will say this:
+
+
+
+The experts who build real businesses aren&rsquo;t the ones with the best ideas. They&rsquo;re the ones who stop waiting and start moving.
+
+
+
+If you&rsquo;re ready, my team is ready.
+
+&#128073; Here&rsquo;s the link to book your call
+
+
+If the calendar doesn&rsquo;t work for you, reply and we&rsquo;ll figure it out.
+
+
+
+If now&rsquo;s not the right time, no hard feelings. But don&rsquo;t let &ldquo;I&rsquo;ll do it later&rdquo; turn into &ldquo;I never did it.&rdquo;
+
+
+
+Your call.
+
+
+Russ Ruffino</pre></div>
+  </span></div>
+  <div class="detail-row"><span class="detail-label">Cross-links</span><span class="detail-val">Fires on qualified applicants from all 3 survey variants (Generic, VSL, Masterclass). Tags <code>application-qualified</code>, then branches on whether an opportunity already exists: found path fires FB Conversion API (disabled) and updates the opportunity to Application Qualified stage; not-found path creates the opportunity at that stage. Both paths converge at Wait 17 Minutes, then send 3 follow-up emails over ~24 hours nudging the contact to book a call.</span></div>
+</div></details><details class="wf-card"><summary><span class="wf-num">24</span><span class="wf-name">Application Survey - Started (Draft) <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge draft">DRAFT</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/5244b5f8-84ae-42af-a0ca-60e8a1408585" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Contact Created (no filters applied)</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">When a contact is created, checks if the source contains 'application survey : Partial Creation'. If true, updates the opportunity status to Application Started. If false, ends immediately. Designed to track partial/incomplete application survey submissions as a pipeline stage.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">Draft/inactive — not currently running. Intended to capture partial application completions and move the opportunity to 'Application Started' stage. The broad trigger (Contact Created, no filters) could enroll unrelated contacts if activated without adding filters.</span></div><div class="detail-row"><span class="detail-label">Screenshot</span><span class="detail-val"><img src="screenshots/application-survey-started-overview.png" alt="Application Survey - Started (Draft) canvas" class="wf-screenshot"></span></div></div></details><details class="wf-card"><summary><span class="wf-num">25</span><span class="wf-name">Application Survey - Submitted -&gt; Note <span class="detail-dot" title="Details captured">&#9679;</span></span><span class="wf-folder">New Lead (GHL -&gt; Sendgrid)</span><span class="wf-subfolder">Masterclass &gt; 2. Applications</span><span class="badge live">LIVE</span><span class="wf-url"><a href="https://app.clientsondemand.app/location/h83O4TKy09yLLdfnIw3K/workflow/0ee2f38f-9697-45bc-acd7-fea08e5cb19a" target="_blank">Open in GHL &nearr;</a></span></summary><div class="wf-detail"><div class="detail-row"><span class="detail-label">Trigger</span><span class="detail-val">Survey submitted (2 parallel triggers):
 1. Survey Submitted - VSL — Survey is: Application Survey - Masterclass
 2. Application Survey Submitted — Survey is: Application Survey</span></div><div class="detail-row"><span class="detail-label">What it does</span><span class="detail-val">Fires on application survey submission. Adds Application Submitted tag, creates a contact note with all survey answers (audience, problem, challenges, revenue, ad willingness), then tags the contact as either Control or Variation based on whether the Funnel field contains 'control'. Used for A/B testing tracking.</span></div><div class="detail-row"><span class="detail-label">Notes</span><span class="detail-val">A/B test tagging: Funnel contains 'control' → Application Control Tag; else → Application Variation Tag. Note trigger naming inconsistency: 'Survey Submitted - VSL' trigger name but filter is Application Survey - Masterclass. Note content captures 5 survey fields:
 - application_audience (expert type)
